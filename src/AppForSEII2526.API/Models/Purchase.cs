@@ -23,6 +23,9 @@ public class Purchase
     [Display(Name = "Metodo de pago")]
     public PaymentMethod PaymentMethod { get; set; } //No es un tipo convencional / normal, por lo que he tenido que crear una enumeración
 
+    [DataType(System.ComponentModel.DataAnnotations.DataType.DateTime)] 
+    [Display(Name = "Fecha de la compra")]
+    public DateTime PurchaseDate { get; set; } //Muy obvio que si hago una compra, saber cual fuel la fecha en la que la realizé, ADEMÁS DE SU HORA ESPECIFICA, por eso  el uso de DateTime.
 
 
 
