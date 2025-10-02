@@ -5,7 +5,7 @@ namespace AppForSEII2526.API.Models;
 public class Purchase
 {
     [Key]
-    public int Id { get; set; } // Primary key, necesaria
+    public int Id { get; set; } // Primary key, necesaria (TODO: identificar claves foraneas)
 
     [Display(Name = "Nombre del cliente")] //No se como de grande es el nombre del cliente, pero me aseguro de que obligatoriamente utilize esta propiedad
     [Required(AllowEmptyStrings = false, ErrorMessage = "Atencion: es necesario que adjunte su nombre")] 
@@ -20,4 +20,16 @@ public class Purchase
     [Required(AllowEmptyStrings = false, ErrorMessage = "Atencion: es necesario que adjunte su direccion de envio del paquete")]
     public string DeliveryAddress { get; set; }
 
+    [Display(Name = "Metodo de pago")]
+    public PaymentMethod PaymentMethod { get; set; } //No es un tipo convencional / normal, por lo que he tenido que crear una enumeración
+
+
+
+
 }//De clase purchase
+
+//En el flujo básico, el sistema mostrará una lista de dispositivos, todos ellos con sus respectivos daots, pero sobre todo el método de pago. Al no ser un tipo convencional, necesito crear una enumeración
+public enum PaymentMethod
+{
+    TarjetaCredito, PayPal, Efectivo //Aunque en el flujo básico solo mencionen tarjeta de credito y paypal, considero poco lógico no tener en cuenta el pago con efectivo.
+}
