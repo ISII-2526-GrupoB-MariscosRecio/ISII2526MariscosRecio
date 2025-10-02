@@ -17,7 +17,7 @@ namespace AppForSEII2526.API.Models
         public string Name { get; set; }//asumo que el nombre es imprescindible pero no le voy a poner una longitud definida
 
         [Display(Name="Metodos de pago")]
-        public PaymentMethod PaymentMethod { get; set; } //hare una enumeracion con los metodos de pago disponibles
+        public PaymentMethodType PaymentMethod { get; set; } //hare una enumeracion con los metodos de pago disponibles
 
         [DataType(DataType.Date)]
         [Display(Name="Fecha del alquiler")]
@@ -38,7 +38,11 @@ namespace AppForSEII2526.API.Models
         public double TotalPrice { get; set; }
 
     }
-
+    //Enumeracion para los metodos de pago
+    public enum PaymentMethodType
+    {
+        Tarjeta,PayPal,Efectivo,Bizum
+    }
 
 
 
