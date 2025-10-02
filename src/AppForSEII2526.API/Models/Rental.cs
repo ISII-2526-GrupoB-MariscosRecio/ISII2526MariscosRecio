@@ -13,11 +13,11 @@ namespace AppForSEII2526.API.Models
         public string DeliveryAddress { get; set; }//hecho
 
         [Display(Name="Nombre")]
-        [Required(AlowEmptyStrings = false, ErrorMnessage = "Porfa introduce tu nombre")]
+        [Required(AlowEmptyStrings = false, ErrorMessage = "Porfa introduce tu nombre")]
         public string Name { get; set; }//asumo que el nombre es imprescindible pero no le voy a poner una longitud definida
 
         [Display(Name="Metodos de pago")]
-        public PaymentMethodType PaymentMethod { get; set; } //hare una enumeracion con los metodos de pago disponibles
+        public PaymentMethodTypes PaymentMethod { get; set; } //hare una enumeracion con los metodos de pago disponibles
 
         [DataType(DataType.Date)]
         [Display(Name="Fecha del alquiler")]
@@ -26,7 +26,7 @@ namespace AppForSEII2526.API.Models
         [DataType(DataType.Date)]
         [Display(Name = "Fecha de comienzo de alquiler")]
         public DateTime RentalDateFrom { get; set; }
-
+        
         [DataType(DataType.Date)]
         [Display(Name = "Fecha de fin del alquiler")]
         public DateTime RentalDateTo { get; set; }
@@ -39,7 +39,7 @@ namespace AppForSEII2526.API.Models
 
     }
     //Enumeracion para los metodos de pago
-    public enum PaymentMethodType
+    public enum PaymentMethodTypes
     {
         Tarjeta,PayPal,Efectivo,Bizum
     }
