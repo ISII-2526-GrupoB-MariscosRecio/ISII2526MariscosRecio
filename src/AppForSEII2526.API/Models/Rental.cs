@@ -38,3 +38,8 @@ namespace AppForSEII2526.API.Models
         public double TotalPrice { get; set; }
 
     }
+    //Enumeracion para los metodos de pago
+    public enum PaymentMethodTypes
+    {
+        Tarjeta, PayPal, Efectivo, Bizum
+    }
