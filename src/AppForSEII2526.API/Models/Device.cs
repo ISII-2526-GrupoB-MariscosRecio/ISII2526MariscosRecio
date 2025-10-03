@@ -42,6 +42,11 @@ Public class Device //voy a crear la clase Device
     public int QuantityForRent{ get; set; }//Creo el atributo con la restriccion de que como minimo se compre 1 
 
     public IList<ReviewItems> ReviewItems { get; set; }
+
+    [StringLength(500,ErrorMessage="La descripcion es demasiado larga")]
+    public string Description { get; set; }//Creo el atributo description para que el usuario pueda explicar porque compra el dispositivo
+
+
 }
 public enum QualityType
 {
