@@ -10,7 +10,7 @@ Public class Device //voy a crear la clase Device
     [StringLength(20, ErrorMessage="Un color no puede tener mas de 20 caracteres")]
     public string Color { get; set; } //color del dispositivo considero que debe tener como MAXIMO 20 caracteres mas de eso considero que es exagerado
 
-    [Required(AlowEmptyStrings = false, ErrorMessage = "Porfa introduce una marca")]
+    [Required(AllowEmptyStrings = false, ErrorMessage = "Porfa introduce una marca")]
     public string Brand {  get; set; } //considero que la marca si que debe estar obligatoriamente
 
     [StringLength(35,ErrorMessage="El nombre del dispositivo no puede tener mas de 35 caracteres")]
