@@ -37,7 +37,7 @@ Public class Device //voy a crear la clase Device
     [Range(0, int.MaxValue, ErrorMessage = "El alquiler  minimo es de 1 dispositivo")]
     public int QuantityForRent { get; set; }//Creo el atributo con la restriccion de que como minimo se compre 1 
 
-    
+    public IList<ReviewItems> ReviewItems { get; set; }
 
    
 
