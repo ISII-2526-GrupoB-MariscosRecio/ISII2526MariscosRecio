@@ -1,19 +1,22 @@
 ﻿using System;
 
-public class Class1
+public class ReviewItem
 {
+    [Required(AllowEmptyString = false, ErrorMessage = "El comentario no puede estar vacio")]
+    public string Comments { get; set; }//Comentario del usuario
 
-    public string Comments { get; set; }
+    public int DeviceId { get; set; }//Identificador del dispositivo que se esta reseñando
 
-    public int DeviceId { get; set; }
+    [Key]
+    public int Id { get; set; }//Identificador unico
 
-    public int Id { get; set; }
-
-    public int Rating { get; set; }
-
-    public int ReviewId { get; set; }
-
-
+    [Required]
+    public int Rating { get; set; }//Calificacion del dispositivo obligatoria
 
 
-    }
+    public int ReviewId { get; set; }//Identificador de la reseña a la que pertenece el item
+
+
+
+
+}
