@@ -14,4 +14,9 @@ public class Purchase
     [Display(Name = "Apellidos del cliente")] //Mismo caso para el nombre del cliente
     [Required(AllowEmptyStrings = false, ErrorMessage = "Atencion: es necesario que adjunte sus apellidos")]
     public string CustomerUserSurname { get; set; }
+
+    [DataType(System.ComponentModel.DataAnnotations.DataType.MultilineText)] //Es posible que nuestro cliente no se limite a una línea para la dirección de la entrega del dispositivo
+    [Display(Name = "Direccion de envio")]
+    [Required(AllowEmptyStrings = false, ErrorMessage = "Atencion: es necesario que adjunte su direccion de envio del paquete")]
+    public string DeliveryAddress { get; set; }
 }
