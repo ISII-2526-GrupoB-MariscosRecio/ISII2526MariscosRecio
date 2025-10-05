@@ -19,4 +19,15 @@ public class Purchase
     [Display(Name = "Direccion de envio")]
     [Required(AllowEmptyStrings = false, ErrorMessage = "Atencion: es necesario que adjunte su direccion de envio del paquete")]
     public string DeliveryAddress { get; set; }
+
+    [Display(Name = "Metodo de pago")]
+    public PaymentMethod PaymentMethod { get; set; } //No es un tipo convencional / normal, por lo que he tenido que crear una enumeración
+
+
+}//De clase purchase
+
+//En el flujo básico, el sistema mostrará una lista de dispositivos, todos ellos con sus respectivos daots, pero sobre todo el método de pago. Al no ser un tipo convencional, necesito crear una enumeración
+public enum PaymentMethod
+{
+    TarjetaCredito, PayPal, Efectivo //Aunque en el flujo básico solo mencionen tarjeta de credito y paypal, considero poco lógico no tener en cuenta el pago con efectivo.
 }
