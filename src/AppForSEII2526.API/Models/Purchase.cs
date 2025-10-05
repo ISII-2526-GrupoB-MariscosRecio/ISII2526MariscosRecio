@@ -27,6 +27,13 @@ public class Purchase
     [Display(Name = "Fecha de la compra")]
     public DateTime PurchaseDate { get; set; } //Muy obvio que si hago una compra, saber cual fuel la fecha en la que la realizé, ADEMÁS DE SU HORA ESPECIFICA, por eso  el uso de DateTime.
 
+    [Display(Name = "Precio total")]
+    public double TotalPrice { get; set; }
+
+    [Display(Name = "Cantidad dispositivos comprados")]]
+    public int Quantity { get; set; }
+
+    //TotalPrice y Quantity son bastante obvios.
 
 }//De clase purchase
 
