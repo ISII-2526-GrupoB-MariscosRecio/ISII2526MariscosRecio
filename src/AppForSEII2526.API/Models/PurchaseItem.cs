@@ -17,4 +17,6 @@ public class PurchaseItem
 
     public int DeviceID { get; set; } // Foreign key, preguntar en clase como se hace
 
+    public int Quantity { get; set; } //Cantidad de dispositivos comprados de este tipo
+
 }//De clase PurchaseItem
