@@ -12,4 +12,7 @@ public class PurchaseItem
     [Required(500, ErrorMessage = "Atencion: la descripcion no puede ser más larga de 500 caracteres", MinimumLength = 50)]
     public string Description { get; set; }
 
+    [Precision(6, 2)] //La precisión indica el total de dígitos, y la cantidad de estos que se usaran para la parte decimal.
+    public double Price { get; set; }
+
 }//De clase PurchaseItem
