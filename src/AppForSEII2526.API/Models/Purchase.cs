@@ -4,5 +4,6 @@ namespace AppForSEII2526.API.Models;
 
 public class Purchase
 {
-
+    [Key]
+    public int Id { get; set; } // Primary key, necesaria (TODO: identificar claves foraneas)
 }
