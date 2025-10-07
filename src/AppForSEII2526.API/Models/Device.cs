@@ -29,7 +29,7 @@ Public class Device //voy a crear la clase Device
     [Display(Name = "Calidad del dispositivo")]
     public QualityType Quality { get; set; }//creo una enumeracion con las calidades que existen de los productos
 
-    [Display(Name = "Año de salida al mercado del telefono")]
+    [Display(Name = "AÃ±o de salida al mercado del telefono")]
     public int Year { get; set; }
 
     [Display(Name = "Cantidad de dispositivos a comprar")]
@@ -46,6 +46,9 @@ Public class Device //voy a crear la clase Device
     [StringLength(500, ErrorMessage = "La descripcion es demasiado larga")]
     public string Description { get; set; }//Creo el atributo description para que el usuario pueda explicar porque compra el dispositivo con un maximo de 500 caracteres
 
+    //Relacion N:N con PurchaseItem
+    public IList<PurchaseItem> PurchaseItems { get; set; }
+    
     public IList<Device> DeviceItems { get; set; } //Segunda parte de la clave foranea con RentDevice
 }
 public enum QualityType
