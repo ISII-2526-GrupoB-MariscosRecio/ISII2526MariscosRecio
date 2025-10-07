@@ -42,7 +42,8 @@ Public class Device //voy a crear la clase Device
     [StringLength(500, ErrorMessage = "La descripcion es demasiado larga")]
     public string Description { get; set; }//Creo el atributo description para que el usuario pueda explicar porque compra el dispositivo con un maximo de 500 caracteres
 
-
+    //Relacion N:N con PurchaseItem
+    public IList<PurchaseItem> PurchaseItems { get; set; }
 }
 public enum QualityType
 {
