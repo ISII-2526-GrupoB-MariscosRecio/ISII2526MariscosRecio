@@ -10,7 +10,7 @@ public class PurchaseItem
     //Las descripciones no deben de ser tan largas, mínimo 50 caracteres, máximo 500 caracteres
     [Display(Name = "Descripcion")]
     [Required(500, ErrorMessage = "Atencion: la descripcion no puede ser más larga de 500 caracteres", MinimumLength = 50)]
-    public string Description { get; set; }
+    public string? Description { get; set; }
 
     [Precision(6, 2)] //La precisión indica el total de dígitos, y la cantidad de estos que se usaran para la parte decimal.
     public double Price { get; set; }
