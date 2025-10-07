@@ -37,6 +37,9 @@ namespace AppForSEII2526.API.Models
         [Display(Name = "Precio del alquiler")]
         public double TotalPrice { get; set; }
 
+        public IList<Rental> RentalItems { get; set; } //Segunda parte de la clave foranea con RentDevice
+
+
     }
     //Enumeracion para los metodos de pago
     public enum PaymentMethodTypes
