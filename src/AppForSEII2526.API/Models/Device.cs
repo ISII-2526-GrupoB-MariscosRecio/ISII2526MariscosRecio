@@ -1,3 +1,7 @@
+using Microsoft.AspNetCore.Identity;
+
+namespace AppForSEII2526.API.Models
+
 Public class Device //voy a crear la clase Device 
 {
     [Key]
@@ -42,7 +46,7 @@ Public class Device //voy a crear la clase Device
     [StringLength(500, ErrorMessage = "La descripcion es demasiado larga")]
     public string Description { get; set; }//Creo el atributo description para que el usuario pueda explicar porque compra el dispositivo con un maximo de 500 caracteres
 
-
+    public IList<Device> DeviceItems { get; set; } //Segunda parte de la clave foranea con RentDevice
 }
 public enum QualityType
 {
