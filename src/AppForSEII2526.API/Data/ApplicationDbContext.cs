@@ -10,6 +10,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     protected override void OnModelCreating (ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-        builder.Entity<PurchaseItem>().HasKey(pi => new {pi.PurchaseId , pi.DevideId });
+        builder.Entity<PurchaseItem>().HasKey(pi => new {pi.PurchaseId , pi.DevideId }); //Confirmación cambios
     }
 }
