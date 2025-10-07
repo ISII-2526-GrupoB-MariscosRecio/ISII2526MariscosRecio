@@ -16,7 +16,7 @@ public class PurchaseItem
     [Precision(6, 2)] //La precisión indica el total de dígitos, y la cantidad de estos que se usaran para la parte decimal.
     public double Price { get; set; }
 
-    public int DeviceID { get; set; } // Parte de Foreign key, preguntar en clase como se hace
+    public int DeviceId { get; set; } // Parte de Foreign key, preguntar en clase como se hace (pequeño cambio en como se nombra atributo)
     public Device Device { get; set; } //Una parte de la Foreign key N:N
 
     public int Quantity { get; set; } //Cantidad de dispositivos comprados de este tipo
