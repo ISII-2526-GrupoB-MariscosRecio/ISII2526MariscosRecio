@@ -47,7 +47,7 @@ Public class Device //voy a crear la clase Device
     public string Description { get; set; }//Creo el atributo description para que el usuario pueda explicar porque compra el dispositivo con un maximo de 500 caracteres
 
     //Relacion N:N con PurchaseItem
-    public IList<PurchaseItem> PurchaseItems { get; set; }
+    public IList<PurchaseItem> PurchaseItems { get; set; } //confirmación de cambios
     
     public IList<Device> DeviceItems { get; set; } //Segunda parte de la clave foranea con RentDevice
 }
