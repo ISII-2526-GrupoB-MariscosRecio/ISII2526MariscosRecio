@@ -1,16 +1,24 @@
 ﻿using System;
 
 namespace AppForSEII2526.API.Models
-
+[PrimaryKey(nameof(Device), nameof(Review)]
 public class ReviewItem
 {
+    
+     
+    public int DeviceId { get; set; }//Identificador del dispositivo al que se le hace el review
+    
+    
+    public int ReviewId { get; set; }//Identificador del review al que pertenece el review item
+
+
     [Required(AllowEmptyString = false, ErrorMessage = "El comentario no puede estar vacío")]
     public string Comments { get; set; }//Comentario del review item
 
-    [ForeingKey(nameof(DeviceId))]
-    public Device Device { get; set; }//Identificador del dispositivo al que se le hace el review
+    
+    public Device Device { get; set; }//Dispositivo al que se le hace el review
 
-    [Key]
+    
     public int Id { get; set; }//Identificador único del review item
 
 
@@ -18,7 +26,7 @@ public class ReviewItem
     [Required]
     public int Rating { get; set; }//Calificación del dispositivo
 
-    [ForeingKey(nameof(ReviewId))]
-    public Review Review { get; set; }//Identificador de la review a la que pertenece el review item
+
+    public Review Review { get; set; }//Review a la que pertenece el review item
 
 }

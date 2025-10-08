@@ -8,9 +8,9 @@ public class Review
     public int CustomerCountry { get; set; }//Pais del cliente que hace la review, lo pongo como int para hacer una enumeracion
 
 
-    public int CustomerId { get; set; }//Identificador del cliente
-    
-    
+    public string? CustomerId { get; set; }//Identificador, nombre del cliente, opcional
+
+
     public date DateOfReview { get; set; }//Fecha de la reseña
 
     [Range(1,5, ErrorMessage = "La calificación tiene que estar entre 1 y 5")]
@@ -23,5 +23,7 @@ public class Review
     [Required(AllowEmptyStrings = false, ErrorMessage = "El titulo de la reseña es obligatorio")]
     public string ReviewTitle { get; set; }//Titulo de la reseña obligatorio
 
+
+    public IList<ReviewItem> ReviewItems { get; set; }
 
 }
