@@ -12,4 +12,6 @@ public class Model
     [StringLength(30,ErrorMessage="El nombre del modelo no puede tener más de 30 caracteres")]
     public string NameModel { get; set; }//Nombre del modelo
 
+
+    public List<Device> Devices { get; set; }//Relación uno a muchos con dispositivos
 }
