@@ -24,4 +24,6 @@ public class ApplicationUser : IdentityUser {
 
     //FK con Purchase (1:N)
     public IList<Purchase> Purchases { get; set; }
+
+    public IList<Review> Reviews { get; set; }
 }
