@@ -3,9 +3,12 @@
   <Class Name="AppForSEII2526.API.Models.Review">
     <Position X="7.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAEABAAAAQAAAAAAAAAIBAAEAAAABAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAEABAQAAQAAAAAAAAAIBAAEAAAABAAAAA=</HashCode>
       <FileName>Models\Review.cs</FileName>
     </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="ApplicationUser" />
+    </ShowAsAssociation>
     <ShowAsCollectionAssociation>
       <Property Name="ReviewItems" />
     </ShowAsCollectionAssociation>
@@ -22,7 +25,7 @@
     </ShowAsAssociation>
   </Class>
   <Class Name="AppForSEII2526.API.Models.ApplicationUser">
-    <Position X="7.5" Y="3" Width="1.5" />
+    <Position X="7.5" Y="3.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAwAAEAAAAAAAAAAAAAAAAQABAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Models\ApplicationUser.cs</FileName>
