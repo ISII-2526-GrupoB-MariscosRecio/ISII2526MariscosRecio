@@ -52,7 +52,7 @@ Public class Device //voy a crear la clase Device
     //Relacion N:N con PurchaseItem
     public IList<PurchaseItem> PurchaseItems { get; set; } //confirmación de cambios
     
-    public IList<Device> DeviceItems { get; set; } //Segunda parte de la clave foranea con RentDevice
+    public IList<RentDevice> DeviceItems { get; set; } //Segunda parte de la clave foranea con RentDevice
 }
 public enum QualityType
 {

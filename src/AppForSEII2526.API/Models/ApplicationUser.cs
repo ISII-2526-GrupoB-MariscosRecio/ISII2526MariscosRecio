@@ -21,4 +21,7 @@ public class ApplicationUser : IdentityUser {
     }
     //FK con Rental
     public IList<Rental> Rentals { get; set; }
+
+    //FK con Purchase (1:N)
+    public IList<Purchase> Purchases { get; set; }
 }

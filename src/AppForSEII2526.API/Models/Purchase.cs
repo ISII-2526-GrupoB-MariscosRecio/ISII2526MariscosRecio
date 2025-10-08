@@ -38,6 +38,8 @@ public class Purchase
     //Relacion N:N con PurchaseItem
     public IList<PurchaseItem> PurchaseItems { get; set; }
 
+    public ApplicationUser ApplicationUser { get; set; } //Segunda parte de FK con Aplication user
+
 }//De clase purchase
 
 //En el flujo básico, el sistema mostrará una lista de dispositivos, todos ellos con sus respectivos daots, pero sobre todo el método de pago. Al no ser un tipo convencional, necesito crear una enumeración
