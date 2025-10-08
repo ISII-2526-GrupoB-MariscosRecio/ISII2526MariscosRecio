@@ -40,7 +40,8 @@ namespace AppForSEII2526.API.Models
         public double? TotalPrice { get; set; }
 
         public IList<Rental> RentalItems { get; set; } //Segunda parte de la clave foranea con RentDevice
-
+        
+        public ApplicationUser ApplicationUser { get; set; } //Segunda parte de FK con Aplication user
 
     }
     //Enumeracion para los metodos de pago
