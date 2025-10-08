@@ -39,7 +39,7 @@ namespace AppForSEII2526.API.Models
         [Display(Name = "Precio del alquiler")]
         public double? TotalPrice { get; set; }
 
-        public IList<Rental> RentalItems { get; set; } //Segunda parte de la clave foranea con RentDevice
+        public IList<RentDevice> RentalDevices { get; set; } //Segunda parte de la clave foranea con RentDevice
         
         public ApplicationUser ApplicationUser { get; set; } //Segunda parte de FK con Aplication user
 
