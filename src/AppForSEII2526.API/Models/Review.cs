@@ -26,4 +26,6 @@ public class Review
 
     public IList<ReviewItem> ReviewItems { get; set; }
 
+    public ApplicationUser ApplicationUser { get; set; }
+
 }
