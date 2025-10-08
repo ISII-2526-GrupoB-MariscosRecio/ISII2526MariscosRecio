@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations; // Falta este using para los atributos
 
 namespace AppForSEII2526.API.Models
 {
@@ -7,13 +8,13 @@ namespace AppForSEII2526.API.Models
         [Key]
         public int Id { get; set; } //hecho
 
-        [DataType(System.Component.DataAnnotations.DataType.MultilineText)]
+        [DataType(DataType.MultilineText)]
         [Display(Name = "Dirreccion de entrega")]
         [Required(AllowEmptyStrings = false, ErrorMessage = "Porfa tienes que introducir tu direccion")]
         public string DeliveryAddress { get; set; }//hecho
 
         [Display(Name = "Nombre")]
-        [Required(AlowEmptyStrings = false, ErrorMessage = "Porfa introduce tu nombre")]
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Porfa introduce tu nombre")]
         public string Name { get; set; }//asumo que el nombre es imprescindible pero no le voy a poner una longitud definida
 
         [Display(Name = "Metodos de pago")]
@@ -39,7 +40,7 @@ namespace AppForSEII2526.API.Models
         [Display(Name = "Precio del alquiler")]
         public double? TotalPrice { get; set; }
 
-        public IList<RentDevice> RentalDevices { get; set; } //Segunda parte de la clave foranea con RentDevice
+        public IList<RentDevice> RentDevices { get; set; } //Segunda parte de la clave foranea con RentDevice
         
         public ApplicationUser ApplicationUser { get; set; } //Segunda parte de FK con Aplication user
 
@@ -49,3 +50,4 @@ namespace AppForSEII2526.API.Models
     {
         Tarjeta, PayPal, Efectivo, Bizum
     }
+}

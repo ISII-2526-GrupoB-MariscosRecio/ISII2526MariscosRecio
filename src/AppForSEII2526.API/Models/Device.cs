@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace AppForSEII2526.API.Models
+namespace AppForSEII2526.API.Models { }
 
-Public class Device //voy a crear la clase Device 
+public class Device //voy a crear la clase Device 
 {
     [Key]
     public int id { get; set; } //identificador unico del dispositivo
@@ -41,7 +41,7 @@ Public class Device //voy a crear la clase Device
     [Range(0, int.MaxValue, ErrorMessage = "El alquiler  minimo es de 1 dispositivo")]
     public int QuantityForRent { get; set; }//Creo el atributo con la restriccion de que como minimo se compre 1 
 
-    public IList<ReviewItems> ReviewItems { get; set; }
+    public IList<ReviewItem> ReviewItems { get; set; }
     
     [Required]
     public Model Model { get; set; }
