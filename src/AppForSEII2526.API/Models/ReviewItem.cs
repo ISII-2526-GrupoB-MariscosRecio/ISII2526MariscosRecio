@@ -1,7 +1,7 @@
 ﻿using System;
 
-namespace AppForSEII2526.API.Models
-[PrimaryKey(nameof(Device), nameof(Review)]
+namespace AppForSEII2526.API.Models { }
+[PrimaryKey(nameof(Device), nameof(Review))]
 public class ReviewItem
 {
     
@@ -12,7 +12,7 @@ public class ReviewItem
     public int ReviewId { get; set; }//Identificador del review al que pertenece el review item
 
 
-    [Required(AllowEmptyString = false, ErrorMessage = "El comentario no puede estar vacío")]
+    [Required(AllowEmptyStrings = false, ErrorMessage = "El comentario no puede estar vacío")]
     public string Comments { get; set; }//Comentario del review item
 
     
