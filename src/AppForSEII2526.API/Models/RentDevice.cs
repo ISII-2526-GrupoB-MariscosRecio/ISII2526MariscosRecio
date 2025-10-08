@@ -24,6 +24,6 @@ Public class RentDevice
     [Required(AllowEmptyStrings = false, ErrorMessage = "Porfa tienes que introducir una cantidad")]
     public int Quantity { get; set; }
 
-    public int RentId { get; set; }
+    
 
 }
