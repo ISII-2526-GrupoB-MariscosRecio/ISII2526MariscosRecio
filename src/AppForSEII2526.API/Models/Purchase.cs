@@ -33,7 +33,10 @@ public class Purchase
     [Display(Name = "Cantidad dispositivos comprados")]]
     public int Quantity { get; set; }
 
-    //TotalPrice y Quantity son bastante obvios.
+    //TotalPrice y Quantity son bastante obvios.//Relacion N:N con PurchaseItem
+
+    //Relacion N:N con PurchaseItem
+    public IList<PurchaseItem> PurchaseItems { get; set; }
 
 }//De clase purchase
 
