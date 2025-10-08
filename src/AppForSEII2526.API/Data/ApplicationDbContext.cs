@@ -12,6 +12,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Rental> Rental{ get; set; }
     public DbSet<Device> Device{ get; set; }
 
+    public DbSet<Review> Review{ get; set; }
+    public DbSet<ReviewItem> ReviewItems { get; set; }      
+    public DbSet<Model> Model { get; set; }
+
+    public DbSet<ApplicationUser> ApplicationUsers { get; set; }
     protected override void OnModelCreating (ModelBuilder builder)
     {
         base.OnModelCreating(builder);
