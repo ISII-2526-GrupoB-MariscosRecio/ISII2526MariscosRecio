@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Identity;
     
 namespace AppForSEII2526.API.Models;
 
-[PrimaryKey(nameof(MovieId), nameof(PurchaseId))]
+[PrimaryKey(nameof(DeviceId), nameof(PurchaseId))] //Clave foránea que relaciona tres clases
 public class PurchaseItem
 {
     
