@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace AppForSEII2526.API.Models
-[PrimaryKey(nameof(DeviceId), nameof(ReviewId)]
+[PrimaryKey(nameof(Device), nameof(Review)]
 public class ReviewItem
 {
     
