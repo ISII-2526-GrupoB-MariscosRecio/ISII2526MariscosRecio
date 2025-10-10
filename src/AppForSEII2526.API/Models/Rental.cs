@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations; // Falta este using para los atributos
+
 
 namespace AppForSEII2526.API.Models
 {
+    using System.ComponentModel.DataAnnotations;// Falta este using para los atributos
     public class Rental
     {
         [Key]
