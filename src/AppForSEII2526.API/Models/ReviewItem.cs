@@ -1,32 +1,34 @@
 ﻿using System;
 
-namespace AppForSEII2526.API.Models { }
-[PrimaryKey(nameof(Device), nameof(Review))]
-public class ReviewItem
+namespace AppForSEII2526.API.Models
 {
-    
-     
-    public int DeviceId { get; set; }//Identificador del dispositivo al que se le hace el review
-    
-    
-    public int ReviewId { get; set; }//Identificador del review al que pertenece el review item
+    [PrimaryKey(nameof(DeviceId), nameof(ReviewId))]
+    public class ReviewItem
+    {
 
 
-    [Required(AllowEmptyStrings = false, ErrorMessage = "El comentario no puede estar vacío")]
-    public string Comments { get; set; }//Comentario del review item
-
-    
-    public Device Device { get; set; }//Dispositivo al que se le hace el review
-
-    
-    public int Id { get; set; }//Identificador único del review item
+        public int DeviceId { get; set; }//Identificador del dispositivo al que se le hace el review
 
 
-    [Range(1,5, ErrorMessage = "La calificación tiene que estar entre 1 y 5")]
-    [Required]
-    public int Rating { get; set; }//Calificación del dispositivo
+        public int ReviewId { get; set; }//Identificador del review al que pertenece el review item
 
 
-    public Review Review { get; set; }//Review a la que pertenece el review item
+        [Required(AllowEmptyStrings = false, ErrorMessage = "El comentario no puede estar vacío")]
+        public string Comments { get; set; }//Comentario del review item
 
+
+        public Device Device { get; set; }//Dispositivo al que se le hace el review
+
+
+        public int Id { get; set; }//Identificador único del review item
+
+
+        [Range(1, 5, ErrorMessage = "La calificación tiene que estar entre 1 y 5")]
+        [Required]
+        public int Rating { get; set; }//Calificación del dispositivo
+
+
+        public Review Review { get; set; }//Review a la que pertenece el review item
+
+    }
 }
