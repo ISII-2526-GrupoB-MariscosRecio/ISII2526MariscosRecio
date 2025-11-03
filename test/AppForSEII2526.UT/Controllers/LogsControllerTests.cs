@@ -80,14 +80,19 @@ namespace AppForSEII2526.UT.Controllers
             Assert.Equal("File name is required", badRequestResult.Value);
         }
 
-        [Fact]
-        public void GetLogContent_ReturnsBadRequest_WhenFileNameContainsInvalidCharacters()
+        [Theory]
+        [InlineData("../etc/passwd")]
+        [InlineData("file\nname.txt")]
+        [InlineData("file\rname.txt")]
+        [InlineData("path/to/file.txt")]
+        [InlineData("path\\to\\file.txt")]
+        public void GetLogContent_ReturnsBadRequest_WhenFileNameContainsInvalidCharacters(string invalidFileName)
         {
             // Arrange
             var controller = new LogsController(_mockLogger.Object, _mockEnv.Object);
 
             // Act
-            var result = controller.GetLogContent("../etc/passwd");
+            var result = controller.GetLogContent(invalidFileName);
 
             // Assert
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Result);

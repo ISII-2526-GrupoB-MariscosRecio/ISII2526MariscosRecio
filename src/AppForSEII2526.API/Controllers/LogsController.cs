@@ -59,8 +59,10 @@ namespace AppForSEII2526.API.Controllers
                     return BadRequest("File name is required");
                 }
 
-                // Validate file name to prevent directory traversal
-                if (fileName.Contains("..") || fileName.Contains("/") || fileName.Contains("\\"))
+                // Validate file name to prevent directory traversal and log forging
+                // Only allow alphanumeric, dash, underscore, and dot characters
+                if (fileName.Contains("..") || fileName.Contains("/") || fileName.Contains("\\") || 
+                    fileName.Contains("\n") || fileName.Contains("\r"))
                 {
                     return BadRequest("Invalid file name");
                 }
@@ -102,8 +104,10 @@ namespace AppForSEII2526.API.Controllers
                     return BadRequest("File name is required");
                 }
 
-                // Validate file name to prevent directory traversal
-                if (fileName.Contains("..") || fileName.Contains("/") || fileName.Contains("\\"))
+                // Validate file name to prevent directory traversal and log forging
+                // Only allow alphanumeric, dash, underscore, and dot characters
+                if (fileName.Contains("..") || fileName.Contains("/") || fileName.Contains("\\") || 
+                    fileName.Contains("\n") || fileName.Contains("\r"))
                 {
                     return BadRequest("Invalid file name");
                 }
