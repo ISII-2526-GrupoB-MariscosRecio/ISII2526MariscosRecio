@@ -1,0 +1,212 @@
+@page "/admin/logs"
+@using Microsoft.AspNetCore.Authorization
+@using System.Net.Http.Headers
+@attribute [Authorize(Roles = "Admin")]
+@inject HttpClient Http
+@inject IConfiguration Configuration
+
+<PageTitle>System Logs</PageTitle>
+
+<h1>System Logs</h1>
+
+<p>View and manage system logs (Admin Only)</p>
+
+@if (isLoading)
+{
+    <p><em>Loading log files...</em></p>
+}
+else if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        @errorMessage
+    </div>
+}
+else if (logFiles == null || !logFiles.Any())
+{
+    <div class="alert alert-info" role="alert">
+        No log files available.
+    </div>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <h4>Available Log Files</h4>
+            <div class="list-group">
+                @foreach (var file in logFiles)
+                {
+                    <button type="button" 
+                            class="list-group-item list-group-item-action @(selectedFile == file ? "active" : "")"
+                            @onclick="() => SelectLogFile(file)">
+                        @file
+                    </button>
+                }
+            </div>
+            <button class="btn btn-primary mt-3" @onclick="RefreshLogFiles">
+                <i class="bi bi-arrow-clockwise"></i> Refresh
+            </button>
+        </div>
+        <div class="col-md-8">
+            @if (!string.IsNullOrEmpty(selectedFile))
+            {
+                <h4>Log Content: @selectedFile</h4>
+                <div class="mb-3">
+                    <label for="linesCount" class="form-label">Number of lines (0 = all):</label>
+                    <input type="number" class="form-control" id="linesCount" style="width: 150px;" 
+                           @bind="linesToShow" min="0" max="10000" />
+                    <button class="btn btn-secondary mt-2" @onclick="LoadLogContent">Load</button>
+                    <button class="btn btn-danger mt-2" @onclick="DeleteLogFile">Delete File</button>
+                </div>
+                
+                @if (isLoadingContent)
+                {
+                    <p><em>Loading log content...</em></p>
+                }
+                else if (!string.IsNullOrEmpty(logContent))
+                {
+                    <div class="card">
+                        <div class="card-body">
+                            <pre style="max-height: 600px; overflow-y: auto; background-color: #f8f9fa; padding: 10px; border-radius: 5px;">@logContent</pre>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="alert alert-secondary" role="alert">
+                    Select a log file to view its content.
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    private List<string>? logFiles;
+    private string? selectedFile;
+    private string? logContent;
+    private string? errorMessage;
+    private bool isLoading = true;
+    private bool isLoadingContent = false;
+    private int linesToShow = 100;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadLogFiles();
+    }
+
+    private async Task LoadLogFiles()
+    {
+        isLoading = true;
+        errorMessage = null;
+        
+        try
+        {
+            var apiBaseUrl = Configuration["ApiBaseUrl"] ?? "https://localhost:7067";
+            var response = await Http.GetAsync($"{apiBaseUrl}/api/Logs/files");
+            
+            if (response.IsSuccessStatusCode)
+            {
+                logFiles = await response.Content.ReadFromJsonAsync<List<string>>();
+            }
+            else
+            {
+                errorMessage = $"Failed to load log files: {response.StatusCode}";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error loading log files: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task RefreshLogFiles()
+    {
+        selectedFile = null;
+        logContent = null;
+        await LoadLogFiles();
+    }
+
+    private async Task SelectLogFile(string fileName)
+    {
+        selectedFile = fileName;
+        logContent = null;
+        await LoadLogContent();
+    }
+
+    private async Task LoadLogContent()
+    {
+        if (string.IsNullOrEmpty(selectedFile))
+            return;
+
+        isLoadingContent = true;
+        errorMessage = null;
+
+        try
+        {
+            var apiBaseUrl = Configuration["ApiBaseUrl"] ?? "https://localhost:7067";
+            var url = $"{apiBaseUrl}/api/Logs/content?fileName={Uri.EscapeDataString(selectedFile)}";
+            
+            if (linesToShow > 0)
+            {
+                url += $"&lines={linesToShow}";
+            }
+
+            var response = await Http.GetAsync(url);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                logContent = await response.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                errorMessage = $"Failed to load log content: {response.StatusCode}";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error loading log content: {ex.Message}";
+        }
+        finally
+        {
+            isLoadingContent = false;
+        }
+    }
+
+    private async Task DeleteLogFile()
+    {
+        if (string.IsNullOrEmpty(selectedFile))
+            return;
+
+        if (!await JSRuntime.InvokeAsync<bool>("confirm", $"Are you sure you want to delete {selectedFile}?"))
+            return;
+
+        try
+        {
+            var apiBaseUrl = Configuration["ApiBaseUrl"] ?? "https://localhost:7067";
+            var response = await Http.DeleteAsync($"{apiBaseUrl}/api/Logs/{Uri.EscapeDataString(selectedFile)}");
+            
+            if (response.IsSuccessStatusCode)
+            {
+                selectedFile = null;
+                logContent = null;
+                await LoadLogFiles();
+            }
+            else
+            {
+                errorMessage = $"Failed to delete log file: {response.StatusCode}";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error deleting log file: {ex.Message}";
+        }
+    }
+
+    [Inject]
+    private IJSRuntime JSRuntime { get; set; } = default!;
+}
