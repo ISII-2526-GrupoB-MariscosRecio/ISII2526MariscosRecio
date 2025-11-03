@@ -182,7 +182,9 @@ else
         if (string.IsNullOrEmpty(selectedFile))
             return;
 
-        if (!await JSRuntime.InvokeAsync<bool>("confirm", $"Are you sure you want to delete {selectedFile}?"))
+        // Sanitize file name for display to prevent XSS
+        var sanitizedFileName = System.Net.WebUtility.HtmlEncode(selectedFile);
+        if (!await JSRuntime.InvokeAsync<bool>("confirm", $"Are you sure you want to delete {sanitizedFileName}?"))
             return;
 
         try
