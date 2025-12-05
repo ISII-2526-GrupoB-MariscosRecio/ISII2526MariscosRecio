@@ -80,7 +80,7 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'appfordevicesforclassesapi'
+          app-name: 'appformariscosfake'
           slot-name: 'Production'
           package: .
 
