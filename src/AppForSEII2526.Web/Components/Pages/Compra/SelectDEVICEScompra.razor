@@ -13,35 +13,185 @@
 	Selección de dispositivos para hacer una compra
 </h3>
 
-
-<div class="container-fluid">
-    <div class="row">
-        <p>Aquí iré mostrando los errores</p>
-    </div>
-    <div class="row">
-        <div class="col-8">
-            <div class="row">
-                <p>Aquí iré mostrando filtros</p>
-            </div>
-            <div class="row">
-                <p>Aquí mostraré la lista de dispositivos</p>
-            </div>
-        </div>
-        <div class="col-2">
-            <p>Aquí mostraré el carrito de la compra</p>
-        </div>
-
-    </div>
-
+<div class="text-center mb-4">
+    <h1 class="display-4">Comprar Dispositivos</h1>
+    <p class="lead">Selecciona los mejores dispositivos para tu colección.</p>
 </div>
 
 
+<div class="container">
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Filtros</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="filterBrand" class="form-label">Marca</label>
+                        <input type="text" class="form-control" id="filterBrand"
+                               @bind="filterBrand" @bind:event="oninput"
+                               placeholder="Ej. Samsung..." />
+                    </div>
 
-@*COMENTARIO: AQUI ABAJO VA TODO LO RELACIONADO CON EL CÖDIGO DE BACK-END*@
+                    <div class="mb-3">
+                        <label for="filterModel" class="form-label">Modelo</label>
+                        <input type="text" class="form-control" id="filterModel"
+                               @bind="filterModel" @bind:event="oninput"
+                               placeholder="Ej. Galaxy..." />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="filterPrice" class="form-label">Precio Máximo: @(filterMaxPrice > 0 ? filterMaxPrice.ToString("C") : "Sin límite")</label>
+                        <input type="range" class="form-range" id="filterPrice"
+                               min="0" max="2000" step="50"
+                               @bind="filterMaxPrice" @bind:event="oninput" />
+                    </div>
+
+                    <button class="btn btn-outline-secondary w-100" @onclick="ClearFilters">
+                        Limpiar Filtros
+                    </button>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mt-3 border-success">
+                <div class="card-body">
+                    <h6 class="card-title text-success">Total Carrito</h6>
+                    <h3 class="card-text">@PurchaseState.TotalPrice.ToString("C")</h3>
+                    <p class="small text-muted">@PurchaseState.Purchase.PurchaseItems.Sum(i => i.Quantity) artículos</p>
+
+                    @if (PurchaseState.Purchase.PurchaseItems.Any())
+                    {
+                        <button class="btn btn-success w-100" @onclick='() => NavigationManager.NavigateTo("/purchase/create")'>Tramitar</button>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            @if (devices == null)
+            {
+                <div class="d-flex justify-content-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                </div>
+            }
+            else if (!FilteredDevices.Any())
+            {
+                <div class="alert alert-warning" role="alert">
+                    No se encontraron dispositivos con los filtros seleccionados.
+                </div>
+            }
+            else
+            {
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                    @foreach (var device in FilteredDevices)
+                    {
+                        <div class="col">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-header text-center bg-light">
+                                    <i class="bi bi-phone" style="font-size: 4rem; color: #6c757d;"></i>
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">@device.Brand @device.Model</h5>
+                                    <p class="card-text">
+                                        <span class="badge bg-info text-dark">@device.Color</span>
+                                    </p>
+                                    <h4 class="text-primary text-end">@device.PriceForPurchase.ToString("C")</h4>
+                                </div>
+                                <div class="card-footer bg-white border-top-0">
+                                    <button class="btn btn-primary w-100" @onclick="() => AddToCart(device)">
+                                        <i class="bi bi-cart-plus"></i> Añadir
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+@*COMENTARIO: AQUI TODO LO RELACIONADO CON EL BACK-END*@
 @code {
+    // Lista para recibir los datos de la API
+    private List<DeviceParaCompraDTOs>? devices;
 
+    // Variables de filtro
+    private string filterBrand = string.Empty;
+    private string filterModel = string.Empty;
+    private decimal filterMaxPrice = 0;
 
+    // Propiedad calculada para el filtrado en memoria
+    private IEnumerable<DeviceParaCompraDTOs> FilteredDevices
+    {
+        get
+        {
+            if (devices == null) return Enumerable.Empty<DeviceParaCompraDTOs>();
 
+            var query = devices.AsEnumerable();
 
+            // Filtro por Marca
+            if (!string.IsNullOrWhiteSpace(filterBrand))
+            {
+                query = query.Where(d => d.Brand.Contains(filterBrand, StringComparison.OrdinalIgnoreCase));
+            }
 
+            // Filtro por Modelo
+            if (!string.IsNullOrWhiteSpace(filterModel))
+            {
+                query = query.Where(d => d.Model.Contains(filterModel, StringComparison.OrdinalIgnoreCase));
+            }
+
+            // Filtro por Precio Máximo
+            // CORRECCIÓN: Usamos PriceForPurchase
+            if (filterMaxPrice > 0)
+            {
+				query = query.Where(d => (decimal)d.PriceForPurchase <= filterMaxPrice); //casting a decimal porque filterMaxPrice es decimal (PriceForPurchase es double)
+            }
+
+            return query;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var client = ClientFactory.CreateClient("API");
+            // Asegúrate de que la ruta sea la correcta a tu controlador
+            devices = await client.GetFromJsonAsync<List<DeviceParaCompraDTOs>>("api/Device");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            devices = new List<DeviceParaCompraDTOs>();
+        }
+    }
+
+    private void ClearFilters()
+    {
+        filterBrand = string.Empty;
+        filterModel = string.Empty;
+        filterMaxPrice = 0;
+    }
+
+    private void AddToCart(DeviceParaCompraDTOs device)
+    {
+        // CORRECCIÓN: Nombres exactos de propiedades
+        var itemToAdd = new PurchaseItemDTO(
+            device.id,               // 'Id' con mayúscula
+            device.Brand,
+            device.Model,
+            device.Color,
+			(decimal)device.PriceForPurchase, // Usamos la propiedad correcta del DTO de origen //Ademas, casting a decimal porque UnitPrice es decimal
+            1,                       // Cantidad
+            ""                       // Descripción
+        );
+
+        PurchaseState.AddDeviceToPurchase(itemToAdd);
+    }
 }
