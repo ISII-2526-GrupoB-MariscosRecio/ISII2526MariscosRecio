@@ -1,20 +1,24 @@
 ﻿@page "/compra/seleccion" 
+
 @using AppForSEII2526.API.DTOs.DeviceDTO
 @using AppForSEII2526.API.DTOs.PurchaseDTO
 @using AppForSEII2526.Web.Data
 @using Microsoft.AspNetCore.Authorization
-@inject PurchaseStateContainer PurchaseState
+
+@*DEPENDENCIAS: las herramientas que registramos en Program.cs*@
+@inject ILogger<SelectDEVICEScompra> Logger
+@*el carrito de la compra (PurchaseState)*@
+@inject PurchaseStateContainer PurchaseState 
 @inject IHttpClientFactory ClientFactory
 @inject NavigationManager NavigationManager
 
 
 @*COMENTARIO: AQUI TODO LO DE HTML*@
 
-@attribute [Authorize]
+@* @attribute [Authorize] *@  @*Esta línea te obliga a poner usuario y contraseña*@
 
-<h3>
-	Selección de dispositivos para hacer una compra
-</h3>
+@* FORZAMOS QUE SEA PÚBLICO: Esto anula cualquier bloqueo de seguridad heredado *@
+@attribute [AllowAnonymous] 
 
 <div class="text-center mb-4">
     <h1 class="display-4">Comprar Dispositivos</h1>
@@ -23,37 +27,38 @@
 
 
 <div class="container">
+
     <div class="row">
+
         <div class="col-md-3 mb-4">
             <div class="card shadow-sm">
+
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Filtros</h5>
                 </div>
+
                 <div class="card-body">
+
+                    @* FILTRO 1: NOMBRE *@
                     <div class="mb-3">
-                        <label for="filterBrand" class="form-label">Marca</label>
-                        <input type="text" class="form-control" id="filterBrand"
-                               @bind="filterBrand" @bind:event="oninput"
-                               placeholder="Ej. Samsung..." />
+                        <label for="filterName" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="filterName"
+                               @bind="filterName" @bind:event="oninput"
+                               placeholder="Ej. Iphone..." />
                     </div>
 
+                    @* FILTRO 2: COLOR *@
                     <div class="mb-3">
-                        <label for="filterModel" class="form-label">Modelo</label>
-                        <input type="text" class="form-control" id="filterModel"
-                               @bind="filterModel" @bind:event="oninput"
-                               placeholder="Ej. Galaxy..." />
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="filterPrice" class="form-label">Precio Máximo: @(filterMaxPrice > 0 ? filterMaxPrice.ToString("C") : "Sin límite")</label>
-                        <input type="range" class="form-range" id="filterPrice"
-                               min="0" max="2000" step="50"
-                               @bind="filterMaxPrice" @bind:event="oninput" />
+                        <label for="filterColor" class="form-label">Color</label>
+                        <input type="text" class="form-control" id="filterColor"
+                               @bind="filterColor" @bind:event="oninput"
+                               placeholder="Ej. Rojo..." />
                     </div>
 
                     <button class="btn btn-outline-secondary w-100" @onclick="ClearFilters">
                         Limpiar Filtros
                     </button>
+
                 </div>
             </div>
 
@@ -66,10 +71,13 @@
                     @if (PurchaseState.Purchase.PurchaseItems.Any())
                     {
                         <button class="btn btn-success w-100" @onclick='() => NavigationManager.NavigateTo("/purchase/create")'>Tramitar</button>
+                        @* ESTO SE IMPLEMETARA EN FUTURO*@
                     }
                 </div>
             </div>
-        </div>
+
+        </div> @*De col-md-3 mb-4*@
+
 
         <div class="col-md-9">
             @if (devices == null)
@@ -114,19 +122,21 @@
                 </div>
             }
         </div>
-    </div>
-</div>
+
+    </div> @*De clase row*@
+</div> @*De clase container*@
 
 
 @*COMENTARIO: AQUI TODO LO RELACIONADO CON EL BACK-END*@
 @code {
+
     // Lista para recibir los datos de la API
     private List<DeviceParaCompraDTOs>? devices;
 
     // Variables de filtro
-    private string filterBrand = string.Empty;
-    private string filterModel = string.Empty;
-    private decimal filterMaxPrice = 0;
+    private string filterName = string.Empty;
+    private string filterColor = string.Empty;
+    
 
     // Propiedad calculada para el filtrado en memoria
     private IEnumerable<DeviceParaCompraDTOs> FilteredDevices
@@ -137,23 +147,18 @@
 
             var query = devices.AsEnumerable();
 
-            // Filtro por Marca
-            if (!string.IsNullOrWhiteSpace(filterBrand))
+            // Lógica de filtrado por NOMBRE
+            if (!string.IsNullOrWhiteSpace(filterName))
             {
-                query = query.Where(d => d.Brand.Contains(filterBrand, StringComparison.OrdinalIgnoreCase));
+                // Usamos d.Name porque es lo que busca el usuario
+                query = query.Where(d => d.Name != null && d.Name.Contains(filterName, StringComparison.OrdinalIgnoreCase));
             }
 
-            // Filtro por Modelo
-            if (!string.IsNullOrWhiteSpace(filterModel))
+            // Lógica de filtrado por COLOR
+            if (!string.IsNullOrWhiteSpace(filterColor))
             {
-                query = query.Where(d => d.Model.Contains(filterModel, StringComparison.OrdinalIgnoreCase));
-            }
-
-            // Filtro por Precio Máximo
-            // CORRECCIÓN: Usamos PriceForPurchase
-            if (filterMaxPrice > 0)
-            {
-				query = query.Where(d => (decimal)d.PriceForPurchase <= filterMaxPrice); //casting a decimal porque filterMaxPrice es decimal (PriceForPurchase es double)
+                // Usamos d.Color
+                query = query.Where(d => d.Color != null && d.Color.Contains(filterColor, StringComparison.OrdinalIgnoreCase));
             }
 
             return query;
@@ -165,21 +170,23 @@
         try
         {
             var client = ClientFactory.CreateClient("API");
-            // Asegúrate de que la ruta sea la correcta a tu controlador
-            devices = await client.GetFromJsonAsync<List<DeviceParaCompraDTOs>>("api/Device");
+            // Asegurar ruta sea la correcta a tu controlador
+            // CORRECCIÓN URL: Añadido /GetDevice porque controlador usa [action]
+            devices = await client.GetFromJsonAsync<List<DeviceParaCompraDTOs>>("api/Device/GetDevicesParaPurchase");
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error: {ex.Message}");
+            Logger.LogError(ex, "Error! There was an error while trying to get the list for filtered purchases");
             devices = new List<DeviceParaCompraDTOs>();
         }
     }
 
     private void ClearFilters()
     {
-        filterBrand = string.Empty;
-        filterModel = string.Empty;
-        filterMaxPrice = 0;
+        filterName = string.Empty;
+        filterColor = string.Empty;
+        
     }
 
     private void AddToCart(DeviceParaCompraDTOs device)
