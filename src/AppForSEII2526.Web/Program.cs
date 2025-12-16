@@ -40,17 +40,10 @@ builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSe
 
 // IMPORTANTE: El puerto 7067 sale de tu launchSettings.json de la API (https)
 
-//MODIFICACIONES: debido a que el mero de presionar la pestaña donde tenemos la selección de compras provocaba la combustión instantánea de mi pantalla, he decidido usar el pratón Factory:
+string? URI2API = "https://localhost:7067/";
 
-//Añadimos un cliente estandar (AddHttpClient), del tipo generado por Swagger. Tras mirar el constructor (http, sp) dentro de la definición,
-// me doy cuenta que el sistema no sabe que poner dentro de sp, por lo que tenemos que darle la url manualmente.
-
-builder.Services.AddHttpClient<AppForSEII2526APIClient>()
-    .AddTypedClient<AppForSEII2526APIClient>((http, sp) =>
-    {
-        var apiUrl = "https://localhost:7067/";
-        return new AppForSEII2526APIClient(apiUrl, http);
-    });
+//Creamos el servicio para acceder a la API desde el proyecto .WEB
+builder.Services.AddScoped<AppForSEII2526APIClient>(sp => new AppForSEII2526APIClient( URI2API, new HttpClient() ) );
 
 // Registramos el StateContainer para gestionar el estado de la compra (carrito)
 builder.Services.AddScoped<PurchaseStateContainer>();
