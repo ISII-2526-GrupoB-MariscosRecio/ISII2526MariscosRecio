@@ -37,10 +37,10 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
-string? URI2API = builder.Configuration.GetValue(typeof(string), "AppForSEII2526_API") as string;
-
-//We create the service for accessing the API from where .WEB project
-builder.Services.AddScoped<AppForSEII2526APIClient>(sp => new AppForSEII2526APIClient(URI2API, new HttpClient()));
+builder.Services.AddHttpClient<AppForSEII2526APIClient>(client => {
+    // Solo configuramos la dirección. NO hacemos return.
+    client.BaseAddress = new Uri("https://localhost:7067/");
+});
 
 // Registramos el StateContainer para gestionar el estado de la compra (carrito)
 builder.Services.AddScoped<PurchaseStateContainer>();
