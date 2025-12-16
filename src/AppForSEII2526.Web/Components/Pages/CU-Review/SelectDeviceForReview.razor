@@ -1,4 +1,4 @@
-﻿@page "/CU-Review/SelectDevicesForReview"
+﻿@page "/Review/SelectDeviceForReview"
 
 @using Microsoft.AspNetCore.Authorization
 @using AppForSEII2526.Web.API
@@ -9,7 +9,7 @@
 @inject ReviewStateContainer reviewState
 @inject NavigationManager navigation
 
-@attribute [Authorize]
+@attribute [AllowAnonymous]
 <h3>Select Devices for Review</h3>
 
 <div class="container-fluid">
