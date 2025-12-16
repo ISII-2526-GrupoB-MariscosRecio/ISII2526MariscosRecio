@@ -1,9 +1,8 @@
 ﻿@page "/compra/seleccion" 
 
-@using AppForSEII2526.API.DTOs.DeviceDTO
-@using AppForSEII2526.API.DTOs.PurchaseDTO
-@using AppForSEII2526.Web.Data
+@using AppForSEII2526.Web.Data @*//NO acceder a api*@
 @using Microsoft.AspNetCore.Authorization
+@using AppForSEII2526.Web.API
 
 @*DEPENDENCIAS: las herramientas que registramos en Program.cs*@
 @inject ILogger<SelectDEVICEScompra> Logger
@@ -11,6 +10,7 @@
 @inject PurchaseStateContainer PurchaseState 
 @inject IHttpClientFactory ClientFactory
 @inject NavigationManager NavigationManager
+@inject AppForSEII2526APIClient client 
 
 
 @*COMENTARIO: AQUI TODO LO DE HTML*@
@@ -105,7 +105,7 @@
                                     <i class="bi bi-phone" style="font-size: 4rem; color: #6c757d;"></i>
                                 </div>
                                 <div class="card-body">
-                                    <h5 class="card-title">@device.Brand @device.Model</h5>
+                                    <h5 class="card-title">@device.Brand @device.Name</h5> @*Con este cambio, debe salir el nombre correcto al aparecer en la seleccion*@
                                     <p class="card-text">
                                         <span class="badge bg-info text-dark">@device.Color</span>
                                     </p>
@@ -131,12 +131,12 @@
 @code {
 
     // Lista para recibir los datos de la API
-    private List<DeviceParaCompraDTOs>? devices;
+	private ICollection<DeviceParaCompraDTOs> devices;
 
     // Variables de filtro
     private string filterName = string.Empty;
     private string filterColor = string.Empty;
-    
+
 
     // Propiedad calculada para el filtrado en memoria
     private IEnumerable<DeviceParaCompraDTOs> FilteredDevices
@@ -169,15 +169,17 @@
     {
         try
         {
-            var client = ClientFactory.CreateClient("API");
+            //var client = ClientFactory.CreateClient("API");
             // Asegurar ruta sea la correcta a tu controlador
             // CORRECCIÓN URL: Añadido /GetDevice porque controlador usa [action]
-            devices = await client.GetFromJsonAsync<List<DeviceParaCompraDTOs>>("api/Device/GetDevicesParaPurchase");
+            // devices = await client.GetFromJsonAsync<List<DeviceParaCompraDTOs>>("api/Device/GetDevicesParaPurchase");
+            devices = await client.GetDevicesParaPurchaseAsync(null, null);      ;
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error: {ex.Message}");
             Logger.LogError(ex, "Error! There was an error while trying to get the list for filtered purchases");
+            //Recordar que DECLARAMOS una colección, pero como no pudimos traer datos (en este caso), entonces creo una lista vacía, para que la pantalla no se rompa.
             devices = new List<DeviceParaCompraDTOs>();
         }
     }
@@ -192,16 +194,19 @@
     private void AddToCart(DeviceParaCompraDTOs device)
     {
         // CORRECCIÓN: Nombres exactos de propiedades
-        var itemToAdd = new PurchaseItemDTO(
-            device.id,               // 'Id' con mayúscula
-            device.Brand,
-            device.Model,
-            device.Color,
-			(decimal)device.PriceForPurchase, // Usamos la propiedad correcta del DTO de origen //Ademas, casting a decimal porque UnitPrice es decimal
-            1,                       // Cantidad
-            ""                       // Descripción
-        );
+        var itemToAdd = new PurchaseItemDTO
+        {
+            //Revisar mayúsculas. Swagger suele convertir 'id' a 'Id' (PascalCase).
+            
+            Id = device.Id,
+            Brand = device.Brand,
+            Model = device.Model,
+            Color = device.Color,
+			UnitPrice = device.PriceForPurchase, //Nota, no poner decimal delante porque ya es decimal
+            Quantity = 1,
+            Description = ""
+        };
 
-        PurchaseState.AddDeviceToPurchase(itemToAdd);
+        PurchaseState.AddDeviceToPurchase(itemToAdd); 
     }
 }
