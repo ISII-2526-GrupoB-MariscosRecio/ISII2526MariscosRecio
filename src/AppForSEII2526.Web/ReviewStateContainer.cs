@@ -1,6 +1,5 @@
 ﻿
-using AppForSEII2526.API.DTOs.DeviceDTO;
-using AppForSEII2526.API.DTOs.ReviewDTOs;
+
 using AppForSEII2526.Web.API;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Drawing;
