@@ -39,6 +39,8 @@ builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSe
 // Registramos el StateContainer para gestionar el estado de la compra (carrito)
 builder.Services.AddScoped<PurchaseStateContainer>();
 
+builder.Services.AddScoped<ReviewStateContainer>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
