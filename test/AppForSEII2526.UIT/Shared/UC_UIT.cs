@@ -11,7 +11,7 @@ namespace AppForSEII2526.UIT.Shared {
         //establish which browser you would like to use
         //private string _browser = "Chrome";
         //private string _browser = "Firefox";
-        private string _browser = "Edge";
+        private string _browser = "Chrome";
 
         protected IWebDriver _driver;
         protected readonly ITestOutputHelper _output;
@@ -20,7 +20,7 @@ namespace AppForSEII2526.UIT.Shared {
         public string _URI {
             get {
                 //set url of your web page 
-                return "https://localhost:7083/";
+                return "https://localhost:7081/";
 
             }
         }

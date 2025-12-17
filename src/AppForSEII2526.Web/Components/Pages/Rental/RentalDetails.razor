@@ -7,8 +7,10 @@
 
 <h3>DetailRental</h3>
 
-
+@*
 @attribute [Authorize]
+*@
+
 
 @if (rental == null) {
     <p>@error</p>
@@ -95,7 +97,7 @@ else {
         }
 
         try {
-            rental = await apiclient.GetRentalAsync(RentalID);
+            rental = await apiclient.RentalAsync(RentalID);
         }
         catch (ApiException exception) {
             rental = null;
