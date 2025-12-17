@@ -94,12 +94,12 @@ else {
             }
         }
 
-        // // // // // // // // // try {
-        // // // // // // // // //     //rental = await apiclient.GetRentalAsync(RentalID);
-        // // // // // // // // // }
-        // // // // // // // // // catch (ApiException exception) {
-        // // // // // // // // //     rental = null;
-        // // // // // // // // // }
+        try {
+            rental = await apiclient.RentalAsync(RentalID);
+        }
+        catch (ApiException exception) {
+            rental = null;
+        }
 
         // Validación de seguridad
         if ((rental == null) || (rental.CustomerUserName != userName)) {
