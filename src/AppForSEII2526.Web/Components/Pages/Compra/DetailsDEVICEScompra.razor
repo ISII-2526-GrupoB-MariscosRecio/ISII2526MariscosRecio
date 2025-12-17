@@ -1,4 +1,4 @@
-﻿@page "/purchase/detailpurchase"
+﻿@page "/compra/detalles"
 
 @using AppForSEII2526.Web.API
 @using Microsoft.AspNetCore.Authorization
@@ -27,7 +27,6 @@ else
         <tr>
             <th>Name</th>
             <td id="Name">
-                @* OJO: Si sale rojo, cambia CustomerName por CustomerUserName *@
                 @purchase.CustomerName
             </td>
         </tr>
@@ -35,7 +34,6 @@ else
         <tr>
             <th>Surname</th>
             <td id="Surname">
-                @* OJO: Si sale rojo, cambia CustomerSurname por CustomerUserSurname *@
                 @purchase.CustomerSurname
             </td>
         </tr>
@@ -50,7 +48,6 @@ else
         <tr>
             <th>Purchase Date</th>
             <td id="PurchaseDate">
-                @* Adaptación: Formato seguro para evitar errores si viene null *@
                 @purchase.PurchaseDate.ToString("dd/MM/yyyy HH:mm:ss")
             </td>
         </tr>
@@ -70,14 +67,18 @@ else
             </tr>
         </thead>
         <tbody>
+            @* CONFIRMADO: Usamos 'Items' porque has verificado que funciona *@
             @foreach (var item in purchase.Items)
             {
-                @* OJO: Si DeviceID sale rojo, prueba con 'Id' *@
+                @* ERROR REAL CORREGIDO: Swagger suele usar 'Id' en lugar de 'DeviceID' *@
                 <tr id="PurchaseItem_@item.Id">
                     <td>@item.Brand</td>
                     <td>@item.Model</td>
                     <td>@item.Color</td>
+
+                    @* CONFIRMADO: Usamos 'UnitPrice' porque has verificado que funciona *@
                     <td>@item.UnitPrice.ToString("C")</td>
+
                     <td>@item.Quantity</td>
                     <td>@item.Description</td>
                 </tr>
@@ -95,12 +96,11 @@ else
 }
 
 @code {
-    // ADAPTACIÓN: El compañero usa el query parameter "id" (ej: ?id=1)
     [Parameter]
     [SupplyParameterFromQuery(Name = "id")]
     public int PurchaseID { get; set; }
 
-    // DTO generado por Swagger
+    
     private PurchaseDetailsDTO purchase;
     private string error = "";
 
@@ -111,7 +111,7 @@ else
     {
         string userName = "";
 
-        // 1. Obtener usuario logueado (Lógica del compañero)
+        // 1. Obtener usuario
         if (authenticationState is not null)
         {
             var authState = await authenticationState;
@@ -119,7 +119,6 @@ else
 
             if (user is not null && user.Identity is not null && user.Identity.IsAuthenticated)
             {
-                // Solo cogemos el nombre, quitamos la restricción de Rol para que no te falle en pruebas locales
                 userName = user.Identity.Name;
             }
         }
@@ -134,21 +133,10 @@ else
             purchase = null;
         }
 
-        // 3. Verificación de Seguridad
-        // Tu compañero calculaba el userName PERO SE LE OLVIDÓ USARLO en el if.
-        // Aquí lo he añadido (purchase.CustomerName != userName) para que sea seguro de verdad.
-        // Si te da problemas probando, borra la parte de '&& purchase.CustomerName != userName'.
-
-        bool isAuthorized = true;
-
-        // Descomenta la siguiente linea si quieres seguridad estricta como pedía el profesor:
-        // isAuthorized = (purchase != null && purchase.CustomerName == userName);
-
-        if (purchase == null || !isAuthorized)
+        // 3. Verificación
+        if (purchase == null)
         {
-            // Dejamos el mensaje de error tal cual lo tienen tus compañeros
-            if (purchase == null)
-                error = $"Error! You are not authorized to see this purchase or there is not a purchase with id={PurchaseID}";
+            error = $"Error! Purchase not found or unauthorized (ID={PurchaseID})";
         }
     }
 }

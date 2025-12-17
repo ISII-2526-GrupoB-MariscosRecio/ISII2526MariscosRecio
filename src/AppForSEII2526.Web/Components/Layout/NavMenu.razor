@@ -47,14 +47,15 @@
         @*boton de enlace en el menú de navegación de la aplicación (Create compra)*@
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="/compra/create">
-                <span class="bi bi-cart-check-fill" aria-hidden="true"></span> Creacion Compra
+                <span class="bi bi-cart-check-fill" aria-hidden="true"></span> Finalizar Compra
             </NavLink>
         </div>
 
 		@*boton de enlace en el menú de navegación de la aplicación (Detalle compra)*@
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="compra/detalles?id=1">
-                <span class="bi bi-cart-check-fill" aria-hidden="true"></span> Detalle Compra
+            @* Este enlace lleva al HISTORIAL, no a un detalle fijo *@
+            <NavLink class="nav-link" href="compra/historial">
+                <span class="bi bi-clock-history" aria-hidden="true"></span> Mis Pedidos
             </NavLink>
         </div>
 

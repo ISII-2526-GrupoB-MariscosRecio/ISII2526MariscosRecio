@@ -206,7 +206,9 @@
             PurchaseState.PurchaseProcessed();
 
             // Cuando tenga vista de detalles, cambia "/" por "/compra/detalle/{result.Id}"
-            NavigationManager.NavigateTo("/");
+            // En lugar de ir a Home ("/"), vamos directamente al detalle de la compra recién hecha.
+            // Usamos result.Id 
+            NavigationManager.NavigateTo($"/compra/detalles?id={result.Id}");
         }
         // Capturar errores de validación específicos (400 Bad Request)
         catch (ApiException<ValidationProblemDetails> ex)
