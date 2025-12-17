@@ -1,15 +1,17 @@
-﻿@page "/compra/detalle"
+﻿@page "/compra/create"
 
 @* 1. USINGS: Solo los necesarios para el Frontend y el Cliente Generado *@
 @using AppForSEII2526.Web.Data
 @using AppForSEII2526.Web.API
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
 
 @* 2. INYECCIONES *@
 @inject PurchaseStateContainer PurchaseState
 @inject AppForSEII2526APIClient Client
 @inject NavigationManager NavigationManager
 @inject ILogger<DetailsDEVICEScompra> Logger
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 @* 3. ATRIBUTOS *@
 @attribute [AllowAnonymous]
@@ -17,14 +19,18 @@
 
 <div class="container mt-4">
     <div class="text-center mb-5">
-        <h1 class="display-5">Detalles del Pedido</h1>
+        <h1 class="display-5">Creación del Pedido</h1>
         <p class="lead">Confirma tu información y finaliza la compra.</p>
     </div>
 
     @* Usamos una variable local para controlar si mostramos el formulario o un error *@
     @if (!string.IsNullOrEmpty(errorMessage))
     {
-        <div class="alert alert-danger">@errorMessage</div>
+        @*Codigo trasnformado del ejemplo de las películas*@
+        <div class="alert alert-danger">
+            <h5 class="alert-heading">Ups, ha ocurrido un error:</h5>
+            <p>@((MarkupString)errorMessage)</p> @* MarkupString permite saltos de línea HTML *@
+        </div>
     }
 
     @* El formulario solo se muestra si hay items (validado en OnInitialized) *@
@@ -142,13 +148,36 @@
 
     // 1. OnInitializedAsync: VALIDACIÓN INICIAL
     // Se usa para preparar la página antes de pintar nada.
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         // Validamos si hay algo que comprar. Si no, expulsamos al usuario.
         if (PurchaseState.Purchase == null || !PurchaseState.Purchase.PurchaseItems.Any())
         {
             // Redirección forzada si no hay carrito
             NavigationManager.NavigateTo("/compra/seleccion");
+            return;
+        }
+
+        // Intentar pre-llenar datos si el usuario está logueado
+        // Modificaciones basadas en repositorio de películas
+        try
+        {
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            if (user.Identity != null && user.Identity.IsAuthenticated)
+            {
+                // Solo rellenamos si el campo está vacío (para no borrar lo que escriba el usuario si recarga)
+                if (string.IsNullOrEmpty(PurchaseState.Purchase.CustomerUserName))
+                {
+                    PurchaseState.Purchase.CustomerUserName = user.Identity.Name ?? "";
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            // Si falla la autenticación, no pasa nada, simplemente no rellenamos los campos
+            Logger.LogWarning("No se pudo recuperar el estado de autenticación: " + ex.Message);
         }
     }
 
@@ -167,26 +196,36 @@
     // 3. Método de envío del formulario
     private async Task HandleCheckout()
     {
+        errorMessage = string.Empty; // Limpiar errores previos
+
         try
         {
-            // Llamada al servicio generado
-            await Client.CreatePurchaseAsync(PurchaseState.Purchase);
+            // Simple y efectivo, sin mapeo manual
+            var result = await Client.CreatePurchaseAsync(PurchaseState.Purchase);
 
             // Limpieza y redirección
             PurchaseState.PurchaseProcessed();
+
+            // Cuando tenga vista de detalles, cambia "/" por "/compra/detalle/{result.Id}"
             NavigationManager.NavigateTo("/");
         }
+        // Capturar errores de validación específicos (400 Bad Request)
+        catch (ApiException<ValidationProblemDetails> ex)
+        {
+            // Esto extrae los errores exactos del servidor (ej: "Stock insuficiente")
+            var errors = ex.Result.Errors.Values.SelectMany(v => v);
+            errorMessage = string.Join("<br/>", errors);
+        }
+        //Capturar otros errores de API genéricos
         catch (ApiException ex)
         {
-            // Error controlado de la API (ej. validación fallida en servidor)
-            errorMessage = $"Error del servidor: {ex.StatusCode}";
-            Logger.LogError(ex, "Error API en checkout");
+            errorMessage = $"Error al procesar la solicitud (Código {ex.StatusCode}). Inténtalo más tarde.";
+            Logger.LogError(ex, "API Exception");
         }
         catch (Exception ex)
         {
-            // Error no controlado (ej. servidor apagado)
-            errorMessage = "Ocurrió un error inesperado al procesar la compra.";
-            Logger.LogError(ex, "Error general en checkout");
+            errorMessage = "Ocurrió un error inesperado.";
+            Logger.LogError(ex, "General Exception");
         }
     }
 }
