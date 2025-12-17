@@ -1,0 +1,230 @@
+﻿@page "/compra/create"
+
+@* 1. USINGS: Solo los necesarios para el Frontend y el Cliente Generado *@
+@using AppForSEII2526.Web.Data
+@using AppForSEII2526.Web.API
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+
+@* 2. INYECCIONES *@
+@inject PurchaseStateContainer PurchaseState
+@inject AppForSEII2526APIClient Client
+@inject NavigationManager NavigationManager
+@inject ILogger<CreateDEVICEScompra> Logger
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@* 3. ATRIBUTOS *@
+@attribute [AllowAnonymous]
+@*Necesito que sea público para pruebas, sin la necesidad de un usuario*@
+
+<div class="container mt-4">
+    <div class="text-center mb-5">
+        <h1 class="display-5">Creación del Pedido</h1>
+        <p class="lead">Confirma tu información y finaliza la compra.</p>
+    </div>
+
+    @* Usamos una variable local para controlar si mostramos el formulario o un error *@
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        @*Codigo trasnformado del ejemplo de las películas*@
+        <div class="alert alert-danger">
+            <h5 class="alert-heading">Ups, ha ocurrido un error:</h5>
+            <p>@((MarkupString)errorMessage)</p> @* MarkupString permite saltos de línea HTML *@
+        </div>
+    }
+
+    @* El formulario solo se muestra si hay items (validado en OnInitialized) *@
+    @if (PurchaseState.Purchase != null && PurchaseState.Purchase.PurchaseItems.Any())
+    {
+        <EditForm Model="@PurchaseState.Purchase" OnValidSubmit="HandleCheckout">
+            <DataAnnotationsValidator />
+
+            <div class="row">
+                <div class="col-md-5">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Datos de Envío y Pago</h5>
+                        </div>
+                        <div class="card-body">
+
+                            <div class="mb-3">
+                                <label class="form-label">Nombre:</label>
+                                <InputText class="form-control" @bind-Value="PurchaseState.Purchase.CustomerUserName" />
+                                <ValidationMessage For="@(() => PurchaseState.Purchase.CustomerUserName)" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Apellidos:</label>
+                                <InputText class="form-control" @bind-Value="PurchaseState.Purchase.CustomerUserSurname" />
+                                <ValidationMessage For="@(() => PurchaseState.Purchase.CustomerUserSurname)" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Dirección:</label>
+                                <InputText class="form-control" @bind-Value="PurchaseState.Purchase.DeliveryAddress" />
+                                <ValidationMessage For="@(() => PurchaseState.Purchase.DeliveryAddress)" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Método de Pago:</label>
+                                <InputSelect class="form-control" @bind-Value="PurchaseState.Purchase.PaymentMethod">
+                                    @foreach (var method in Enum.GetValues(typeof(PaymentMethod)))
+                                    {
+                                        <option value="@method">@method</option>
+                                    }
+                                </InputSelect>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-7">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-secondary text-white">
+                            <h5 class="mb-0">Artículos en la Cesta</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Dispositivo</th>
+                                        <th class="text-center">Cant.</th>
+                                        <th class="text-end">Precio</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in PurchaseState.Purchase.PurchaseItems)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <strong>@item.Brand @item.Model</strong>
+                                                @* Requisito: Descripción opcional *@
+                                                <InputText class="form-control form-control-sm mt-1"
+                                                           placeholder="Nota opcional..."
+                                                           @bind-Value="item.Description" />
+                                            </td>
+                                            <td class="text-center align-middle">@item.Quantity</td>
+                                            <td class="text-end align-middle">@item.UnitPrice.ToString("C")</td>
+                                            <td class="text-center align-middle">
+                                                <button type="button" class="btn btn-danger btn-sm" @onclick="() => RemoveItem(item)">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="card-footer bg-light">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h4 class="mb-0">Total:</h4>
+                                <h3 class="text-success mb-0">@PurchaseState.TotalPrice.ToString("C")</h3>
+                            </div>
+                            <hr />
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-success btn-lg">Finalizar Compra</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </EditForm>
+    }
+    else
+    {
+        @* Fallback visual por si la redirección tarda unos milisegundos *@
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p>Redirigiendo a la tienda...</p>
+        </div>
+    }
+</div>
+
+@code {
+    // Variable para feedback de errores
+    private string errorMessage;
+
+    // 1. OnInitializedAsync: VALIDACIÓN INICIAL
+    // Se usa para preparar la página antes de pintar nada.
+    protected override async Task OnInitializedAsync()
+    {
+        // Validamos si hay algo que comprar. Si no, expulsamos al usuario.
+        if (PurchaseState.Purchase == null || !PurchaseState.Purchase.PurchaseItems.Any())
+        {
+            // Redirección forzada si no hay carrito
+            NavigationManager.NavigateTo("/compra/seleccion");
+            return;
+        }
+
+        // Intentar pre-llenar datos si el usuario está logueado
+        // Modificaciones basadas en repositorio de películas
+        try
+        {
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            if (user.Identity != null && user.Identity.IsAuthenticated)
+            {
+                // Solo rellenamos si el campo está vacío (para no borrar lo que escriba el usuario si recarga)
+                if (string.IsNullOrEmpty(PurchaseState.Purchase.CustomerUserName))
+                {
+                    PurchaseState.Purchase.CustomerUserName = user.Identity.Name ?? "";
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            // Si falla la autenticación, no pasa nada, simplemente no rellenamos los campos
+            Logger.LogWarning("No se pudo recuperar el estado de autenticación: " + ex.Message);
+        }
+    }
+
+    // 2. Método auxiliar para borrar ítems
+    private void RemoveItem(PurchaseItemDTO item)
+    {
+        PurchaseState.RemoveDeviceFromPurchase(item);
+
+        // Si al borrar se queda vacío, OnInitialized ya pasó, así que comprobamos aquí también
+        if (!PurchaseState.Purchase.PurchaseItems.Any())
+        {
+            NavigationManager.NavigateTo("/compra/seleccion");
+        }
+    }
+
+    // 3. Método de envío del formulario
+    private async Task HandleCheckout()
+    {
+        errorMessage = string.Empty; // Limpiar errores previos
+
+        try
+        {
+            // Simple y efectivo, sin mapeo manual
+            var result = await Client.CreatePurchaseAsync(PurchaseState.Purchase);
+
+            PurchaseState.PurchaseProcessed();
+
+            // Cuando tenga vista de detalles, cambia "/" por "/compra/detalle/{result.Id}"
+            NavigationManager.NavigateTo("/");
+        }
+        // Capturar errores de validación específicos (400 Bad Request)
+        catch (ApiException<ValidationProblemDetails> ex)
+        {
+            // Esto extrae los errores exactos del servidor (ej: "Stock insuficiente")
+            var errors = ex.Result.Errors.Values.SelectMany(v => v);
+            errorMessage = string.Join("<br/>", errors);
+        }
+        //Capturar otros errores de API genéricos
+        catch (ApiException ex)
+        {
+            errorMessage = $"Error al procesar la solicitud (Código {ex.StatusCode}). Inténtalo más tarde.";
+            Logger.LogError(ex, "API Exception");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Ocurrió un error inesperado.";
+            Logger.LogError(ex, "General Exception");
+        }
+    }
+}
