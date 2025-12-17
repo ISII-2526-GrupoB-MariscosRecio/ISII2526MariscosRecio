@@ -10,59 +10,69 @@
 @inject NavigationManager navigation
 
 @attribute [AllowAnonymous]
+
 <h3>Select Devices for Review</h3>
 
 <div class="container-fluid">
     @* --- Área de Errores --- *@
     <div class="row alert alert-danger" role="alert" hidden="@hideErrors">
-        <p id="ErrorsShown">Errors: @errors</p>
+        <p id="ErrorsShown" class="mb-0">@errors</p>
     </div>
 
     <div class="row">
-        @* --- Columna Izquierda: Filtros y Tabla (Paso 2 y 2.1) --- *@
-        <div class="col-8">
+        @* --- Columna Izquierda: Filtros y Tabla (9 columnas) --- *@
+        <div class="col-md-9">
 
-            @* --- Filtros de Búsqueda (Paso 2.1: Marca y Año) --- *@
-            <div class="row">
-                @* Filtro: Brand (Marca) *@
-                <div class="col">
-                    <div class="input-group mb-3">
-                        <span class="input-group-text" id="basic-addon1">Brand</span>
-                        <select class="form-select" aria-label="Select Brand" @bind="deviceBrandSelected" id="selectBrand">
-                            <option value="All" selected>All</option>
-                            @foreach (string brandName in brandsNames) {
-                                <option value="@brandName">@brandName</option>
-                            }
-                        </select>
+            @* --- Filtros de Búsqueda --- *@
+            <div class="card mb-3">
+                <div class="card-header bg-light">Filters</div>
+                <div class="card-body">
+                    @* USO DE 'row g-3 align-items-end': 
+                       - g-3: Espacio entre columnas.
+                       - align-items-end: Alinea los elementos abajo (para que el botón cuadre con los inputs).
+                    *@
+                    <div class="row g-3 align-items-end">
+
+                        @* Filtro: Brand (4 columnas) *@
+                        <div class="col-md-4">
+                            <label for="selectBrand" class="form-label mb-1">Brand</label>
+                            <select class="form-select" @bind="deviceBrandSelected" id="selectBrand">
+                                <option value="All" selected>All Brands</option>
+                                @foreach (string brandName in brandsNames) {
+                                    <option value="@brandName">@brandName</option>
+                                }
+                            </select>
+                        </div>
+
+                        @* Filtro: Year (4 columnas) *@
+                        <div class="col-md-4">
+                            <label for="inputYear" class="form-label mb-1">Year</label>
+                            <input type="number" class="form-control" @bind="deviceYearSelected" placeholder="0 for All" id="inputYear" />
+                        </div>
+
+                        @* Botón Buscar (4 columnas) *@
+                        <div class="col-md-4">
+                            <button type="button" class="btn btn-primary w-100" @onclick="@SearchDevices" id="searchDevices">
+                                <i class="bi bi-search"></i> Search Devices
+                            </button>
+                        </div>
                     </div>
-                </div>
-
-                @* Filtro: Year (Año) - Aquí aplicamos tu lógica de int *@
-                <div class="col">
-                    <div class="input-group mb-3">
-                        <span class="input-group-text">Year</span>
-                        @* Usamos input number. Si es 0 se asume "Todos" *@
-                        <input type="number" class="form-control" @bind="deviceYearSelected" placeholder="Year (0 for All)" id="inputYear" />
-                    </div>
-                </div>
-
-                @* Botón Buscar *@
-                <div class="col">
-                    <button type="button" class="btn btn-primary" @onclick=@SearchDevices id="searchDevices">Search devices</button>
                 </div>
             </div>
 
-            @* --- Tabla de Resultados (Paso 2.3) --- *@
+            @* --- Tabla de Resultados --- *@
             <div class="row">
                 @if (devices == null) {
-                    <p>Loading devices....</p>
+                    <p><em>Loading devices...</em></p>
+                }
+                else if (devices.Count == 0) {
+                    <div class="alert alert-warning">No devices found matching the criteria.</div>
                 }
                 else {
-                    <div class="mh-100 table-responsive">
-                        <table class="table table-condensed table-hover" id="TableOfDevices">
-                            <thead>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle" id="TableOfDevices">
+                            <thead class="table-light">
                                 <tr>
-                                    @* Columnas según Paso 2: nombre, marca, color, año, modelo *@
                                     <th>Name</th>
                                     <th>Brand</th>
                                     <th>Color</th>
@@ -80,8 +90,16 @@
                                         <td>@dev.Year</td>
                                         <td>@dev.Model</td>
                                         <td>
-                                            @* Paso 3: Seleccionar dispositivos *@
-                                            <button class="btn btn-outline-secondary" id="deviceToReview_@dev.Id" @onclick="@(() => AddDevice(dev))">Add to Review</button>
+                                            @if (IsDeviceInCart(dev.Id)) {
+                                                <button class="btn btn-success btn-sm" disabled>
+                                                    <i class="bi bi-check"></i> Added
+                                                </button>
+                                            }
+                                            else {
+                                                <button class="btn btn-outline-primary btn-sm" id="deviceToReview_@dev.Id" @onclick="@(() => AddDevice(dev))">
+                                                    Add to Review
+                                                </button>
+                                            }
                                         </td>
                                     </tr>
                                 }
@@ -92,27 +110,57 @@
             </div>
         </div>
 
-        @* --- Columna Derecha: Carrito de Reseñas (Paso 3 y 4) --- *@
-        <div class="col-2" hidden="@hideReviewingCart">
-            <div class="row">
-                <h3>Review Cart</h3>
-            </div>
-            @* Lista de items seleccionados *@
-            @foreach (ReviewItemDTO item in review.ReviewItems) {
-                <div class="row mb-2">
-                    <button type="button" class="btn btn-light" id="removeDevice_@item.DeviceId" @onclick="@(() => RemoveReviewItem(item))">
-                        x @item.DeviceName (@item.ModelName)
-                    </button>
+        @* --- Columna Derecha: Carrito de Reseñas (3 columnas) --- *@
+        <div class="col-md-3">
+            <div class="card border-primary mb-3 sticky-top" style="top: 20px;">
+
+                @* CABECERA DEL CARRITO CON BOTÓN DE LIMPIAR *@
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <span>Review Cart (@review.ReviewItems.Count)</span>
+                    @if (review.ReviewItems.Count > 0) {
+                        @* Botón para limpiar todo *@
+                        <button class="btn btn-sm btn-danger ms-2" @onclick="ClearCart" title="Remove All">
+                            Clear
+                        </button>
+                    }
                 </div>
-            }
-            @* Paso 4: Botón Reseñar Dispositivos (Navega a la siguiente pantalla) *@
-            <div class="row mt-3">
-                <button type="button" class="btn btn-primary" id="startReviewButton" @onclick=@GoToReviewForm>Review Devices</button>
+
+                <div class="card-body">
+                    @if (review.ReviewItems.Count == 0) {
+                        <p class="text-muted small">No devices selected yet.</p>
+                    }
+                    else {
+                        <ul class="list-group list-group-flush mb-3">
+                            @foreach (ReviewItemDTO item in review.ReviewItems) {
+                                <li class="list-group-item d-flex justify-content-between align-items-center p-2">
+                                    <div class="lh-sm">
+                                        <small class="fw-bold">@item.DeviceName</small><br />
+                                        <small class="text-muted">@item.ModelName</small>
+                                    </div>
+                                    <button type="button" class="btn btn-outline-danger btn-sm py-0 px-1"
+                                            id="removeDevice_@item.DeviceId"
+                                            @onclick="@(() => RemoveReviewItem(item))"
+                                            title="Remove">
+                                        &times;
+                                    </button>
+                                </li>
+                            }
+                        </ul>
+                    }
+
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-primary" id="startReviewButton"
+                                @onclick="@GoToReviewForm"
+                                disabled="@(review.ReviewItems.Count == 0)">
+                            Proceed to Review
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
-
     </div>
 </div>
+
 
 @code {
     private string deviceBrandSelected;
@@ -122,12 +170,8 @@
     private ICollection<DeviceParaReseñasDTO> devices;
     private bool hideErrors { get { return errors.Length == 0; } }
     private string errors = "";
-    private string deviceName { get; set; }
-    private int? deviceYear { get; set; }
-    private DateTime _from;
-
-
-    private DateTime _to;
+    [SupplyParameterFromQuery]
+    public bool EditMode { get; set; }
 
 
     private ReviewForCreateDTO review => reviewState.Review;
@@ -163,7 +207,11 @@
     }
 
     protected override async Task OnInitializedAsync() {
-
+        
+        if (!EditMode) {
+            review.ReviewItems.Clear();
+           
+        }
         try {
             //brandsNames = await apiclient.G
             // Simulación de datos para probar la interfaz
@@ -180,7 +228,17 @@
 
         await SearchDevices(); 
 
-       
+    }
+
+    private void ClearCart() {
+        // Asumiendo que ReviewItems es una List<ReviewItemDTO>, podemos usar Clear()
+        review.ReviewItems.Clear();
+    }
+
+
+    // Helper para verificar visualmente si ya está añadido
+    private bool IsDeviceInCart(int deviceId) {
+        return review.ReviewItems.Any(x => x.DeviceId == deviceId);
     }
 
     private void GoToReviewForm() {
@@ -191,7 +249,7 @@
         }
 
         // Navegar a la pantalla del Paso 5 (Formulario de datos)
-        navigation.NavigateTo("/Review/CreateDeviceForReview");
+        navigation.NavigateTo("/Review/CreateReview");
     }
 
 }

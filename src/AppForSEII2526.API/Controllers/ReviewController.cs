@@ -78,9 +78,16 @@ namespace AppForSEII2526.API.Controllers
             if (reviewForCreate.ReviewItems.Count == 0)
                 ModelState.AddModelError("ReviewItems", "Error! You must include at least one device to be reviewed");
             // validar usuario
-            var user = _context.ApplicationUsers.FirstOrDefault(au => au.UserName == reviewForCreate.CustomerId);
-            if (user == null)
-                ModelState.AddModelError("RentalApplicationUser", "Error! UserName is not registered");
+            // Buscamos el usuario por su UserName
+            var user = _context.ApplicationUsers.FirstOrDefault(u => u.UserName == reviewForCreate.CustomerId);
+            if (!string.IsNullOrEmpty(reviewForCreate.CustomerId)) {              
+
+                if (user == null) {
+                    ModelState.AddModelError("ReviewItems", $"Error! the user is not valid");
+                }
+                
+            }
+            
             // Validar pais
             if (!ValoresPermitidos.Contains(reviewForCreate.CustomerCountry))
                 ModelState.AddModelError("CustomerCountry", "Error! The country is not valid. Allowed values are: 1 (Spain), 5 (France), 10 (Germany), 20 (Italy)");
@@ -120,7 +127,7 @@ namespace AppForSEII2526.API.Controllers
                 }).ToList();
 
             Review review = new Review {
-                DateOfReview = reviewForCreate.DateOfReview, 
+                DateOfReview = DateTime.Now, 
                 ReviewTitle = reviewForCreate.ReviewTitle,
                 CustomerId = reviewForCreate.CustomerId, 
                 CustomerCountry = reviewForCreate.CustomerCountry,
