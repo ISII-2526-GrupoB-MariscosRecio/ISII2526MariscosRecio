@@ -8,7 +8,8 @@
 @inject ILogger<SelectDEVICEScompra> Logger
 @*el carrito de la compra (PurchaseState)*@
 @inject PurchaseStateContainer PurchaseState 
-@inject IHttpClientFactory ClientFactory
+@* @inject IHttpClientFactory ClientFactory *@ 
+@*ClienFactory ya no me es necesario, sobre todo porque provoca excepción dentro de la realización de los detalles*@
 @inject NavigationManager NavigationManager
 @inject AppForSEII2526APIClient client 
 
@@ -70,7 +71,7 @@
 
                     @if (PurchaseState.Purchase.PurchaseItems.Any())
                     {
-                        <button class="btn btn-success w-100" @onclick='() => NavigationManager.NavigateTo("/purchase/create")'>Tramitar</button>
+                        <button class="btn btn-success w-100" @onclick='() => NavigationManager.NavigateTo("/compra/create")'>Tramitar</button>
                         @* ESTO SE IMPLEMETARA EN FUTURO*@
                     }
                 </div>

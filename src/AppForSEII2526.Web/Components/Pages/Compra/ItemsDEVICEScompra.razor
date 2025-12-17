@@ -1,0 +1,131 @@
+﻿@page "/compra/historial"
+
+@using AppForSEII2526.Web.API
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Collections.Generic @* A veces necesario para ICollection *@
+
+@inject AppForSEII2526APIClient apiclient
+@inject NavigationManager NavigationManager
+
+@attribute [Authorize]
+
+<div class="container mt-4">
+    <h3><i class="bi bi-clock-history"></i> Historial de Compras</h3>
+    <p>Aquí puedes consultar todos tus pedidos realizados.</p>
+
+    @if (myPurchases == null)
+    {
+        <div class="text-center mt-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p>Cargando tus compras...</p>
+        </div>
+    }
+    else if (!myPurchases.Any())
+    {
+        <div class="alert alert-info text-center mt-4">
+            <h4>Aún no has realizado ninguna compra</h4>
+            <p>¿A qué esperas para estrenarte?</p>
+            <button class="btn btn-primary" @onclick='() => NavigationManager.NavigateTo("/compra/seleccion")'>
+                Ir a la Tienda
+            </button>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive mt-3">
+            <table class="table table-hover table-striped align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Dirección de Entrega</th>
+                        <th class="text-end">Total</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var purchase in myPurchases)
+                    {
+                        <tr>
+                            <td>
+                                @purchase.PurchaseDate.ToString("dd/MM/yyyy HH:mm")
+                            </td>
+                            <td>
+                                @purchase.DeliveryAddress
+                            </td>
+                            <td class="text-end fw-bold">
+                                @purchase.TotalPrice.ToString("C")
+                            </td>
+                            <td class="text-center">
+                                <button class="btn btn-outline-primary btn-sm"
+                                        @onclick='() => NavigateToDetails(purchase.Id)'>
+                                    <i class="bi bi-eye-fill"></i> Ver Detalles
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@code {
+    // Usamos ICollection del DTO que definiste en el backend
+    private ICollection<PurchaseDetailsDTO> myPurchases;
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // 1. Obtenemos el usuario actual
+            string userName = await GetCurrentUserName();
+
+            // 2. CORRECCIÓN: Llamamos al método PLURAL (GetPurchasesAsync)
+            
+            var allPurchases = await apiclient.GetPurchasesAsync();
+
+            // 3. Filtramos
+            if (!string.IsNullOrEmpty(userName) && allPurchases != null)
+            {
+                myPurchases = allPurchases
+                    .Where(p => p.CustomerName == userName)
+                    .OrderByDescending(p => p.PurchaseDate)
+                    .ToList();
+            }
+            else
+            {
+                myPurchases = new List<PurchaseDetailsDTO>();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error cargando compras: {ex.Message}");
+            // Inicializamos la lista vacía para evitar error visual
+            myPurchases = new List<PurchaseDetailsDTO>();
+        }
+    }
+
+    private async Task<string> GetCurrentUserName()
+    {
+        if (authenticationState is not null)
+        {
+            var authState = await authenticationState;
+            var user = authState?.User;
+
+            if (user?.Identity != null && user.Identity.IsAuthenticated)
+            {
+                return user.Identity.Name;
+            }
+        }
+        return string.Empty;
+    }
+
+    private void NavigateToDetails(int purchaseId)
+    {
+        NavigationManager.NavigateTo($"/compra/detalles?id={purchaseId}");
+    }
+}

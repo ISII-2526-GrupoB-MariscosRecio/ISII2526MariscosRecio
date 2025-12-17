@@ -75,6 +75,45 @@ namespace AppForSEII2526.API.Controllers
             return Ok(purchase);
         }
 
+        // GET: api/Purchase/GetPurchases
+        // Para Web, que me devuelve varias compras
+        [HttpGet]
+        [Route("[action]")]
+        [ProducesResponseType(typeof(List<PurchaseDetailsDTO>), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<IEnumerable<PurchaseDetailsDTO>>> GetPurchases()
+        {
+            if (_context.Purchase == null)
+            {
+                return NotFound();
+            }
+
+            // Copiamos la misma lógica de proyección que en Details, pero sin filtrar por ID
+            var purchases = await _context.Purchase
+                .Include(r => r.PurchaseItems)
+                    .ThenInclude(pi => pi.Device)
+                .Select(r => new PurchaseDetailsDTO(
+                    r.Id,
+                    r.CustomerUserName,
+                    r.CustomerUserSurname,
+                    r.DeliveryAddress,
+                    r.PurchaseDate,
+                    (decimal)r.TotalPrice,
+                    r.Quantity,
+                    r.PurchaseItems.Select(pi => new PurchaseItemDTO(
+                        pi.Device.id,
+                        pi.Device.Brand,
+                        pi.Device.Model.NameModel,
+                        pi.Device.Color,
+                        (decimal)pi.Device.PriceForPurchase,
+                        pi.Quantity,
+                        pi.Description ?? string.Empty
+                    )).ToList()
+                ))
+                .ToListAsync(); // <-- Importante: ToListAsync() devuelve la lista completa
+
+            return Ok(purchases);
+        }
+
         //METODO POST - CREATE PURCHASE
 
         [HttpPost]
