@@ -1,0 +1,71 @@
+﻿<div class="modal fade show" id="DialogOKSaveDelete" style="display:block; background-color: rgba(10,10,10,.8);" aria-modal="true" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">@Caption</h4>
+                <button type="button" class="close" @onclick="@Cancel">
+                    &times;
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>@Message</p>
+            </div>
+            <div class="modal-footer">
+                @switch (Type) {
+                    case Category.Okay:
+                        <button type="button" class="btn btn-primary" @onclick=@Ok id="Button_DialogOK">
+                            OK
+                        </button>
+                        break;
+                    case Category.SaveNot:
+                        <button type="button" class="btn btn-primary" @onclick=@Ok id="Button_DialogOK">
+                            Save
+                        </button>
+                        <button type="button" class="btn btn-warning" @onclick="@Cancel" id="Button_DialogCancel">
+                            Don't Save
+                        </button>
+                        break;
+                    case Category.DeleteNot:
+                        <button type="button" class="btn btn-danger" @onclick=@Ok id="Button_DialogOK">
+                            Delete
+                        </button>
+                        <button type="button" class="btn btn-warning" @onclick="@Cancel" id="Button_DialogCancel">
+                            Don't Delete
+                        </button>
+                        break;
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    // Título del Modal
+    [Parameter] public string Caption { get; set; }
+
+    // Mensaje del cuerpo
+    [Parameter] public string Message { get; set; }
+
+    // Evento de cierre (True = Confirmar, False = Cancelar)
+    [Parameter] public EventCallback<bool> OnClose { get; set; }
+
+    // Tipo de botones a mostrar
+    [Parameter] public Category Type { get; set; }
+
+    // Cancela la operación (Devuelve false)
+    private Task Cancel() {
+        return OnClose.InvokeAsync(false);
+    }
+
+    // Confirma la operación (Devuelve true)
+    private Task Ok() {
+        return OnClose.InvokeAsync(true);
+    }
+
+    // Enum para los tipos de botones
+    public enum Category {
+        Okay,
+        SaveNot,
+        DeleteNot
+    }
+}
