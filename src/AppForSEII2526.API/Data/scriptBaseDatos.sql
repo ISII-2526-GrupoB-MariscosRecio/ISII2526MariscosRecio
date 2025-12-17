@@ -17,8 +17,27 @@ INSERT INTO [dbo].[Device] ([id], [Color], [Brand], [Name], [PriceForRent], [Pri
 INSERT INTO [dbo].[Device] ([id], [Color], [Brand], [Name], [PriceForRent], [PriceForPurchase], [Quality], [Year], [QuantityForPurchase], [QuantityForRent], [ModelId], [Description]) VALUES (12, N'Rojo', N'Sony', N'Xperia Z5 Compact', 6, 60, 5, 2016, 1, 1, 5, N'Pequeño y robusto, batería con desgaste moderado.')
 SET IDENTITY_INSERT [dbo].[Device] OFF
 
-INSERT INTO [dbo].[AspNetUsers] ([Id], [Name], [Surname], [UserName], [NormalizedUserName], [Email], [NormalizedEmail], [EmailConfirmed], [PasswordHash], [SecurityStamp], [ConcurrencyStamp], [PhoneNumber], [PhoneNumberConfirmed], [TwoFactorEnabled], [LockoutEnd], [LockoutEnabled], [AccessFailedCount]) VALUES (N'1', N'juan', N'lopez', N'juanKILLA', N'juanKILLA', N'juanXkilla@gmail.com', N'juanXkilla@gmail.com', 1, N'1234', N'1234', N'1234', N'1234', 1, 1, N'12/12/2025 0:00:00 +01:00', 1, 0)
-INSERT INTO [dbo].[AspNetUsers] ([Id], [Name], [Surname], [UserName], [NormalizedUserName], [Email], [NormalizedEmail], [EmailConfirmed], [PasswordHash], [SecurityStamp], [ConcurrencyStamp], [PhoneNumber], [PhoneNumberConfirmed], [TwoFactorEnabled], [LockoutEnd], [LockoutEnabled], [AccessFailedCount]) VALUES (N'2', N'Paco', N'Nuñez', N'PacoSinger', N'PacoSinger', N'pacoSinger@gmail.com', N'pacoSinger@gmail.com', 1, N'2345', N'2345', N'2345', N'2345', 1, 1, N'23/11/2025 0:00:00 +01:00', 1, 0)
-INSERT INTO [dbo].[AspNetUsers] ([Id], [Name], [Surname], [UserName], [NormalizedUserName], [Email], [NormalizedEmail], [EmailConfirmed], [PasswordHash], [SecurityStamp], [ConcurrencyStamp], [PhoneNumber], [PhoneNumberConfirmed], [TwoFactorEnabled], [LockoutEnd], [LockoutEnabled], [AccessFailedCount]) VALUES (N'3', N'Laura', N'Jimenez', N'LauraWita', N'LauraWita', N'Laura@gmail.com', N'Laura@gmail.com', 1, N'4567', N'4567', N'4567', N'4567', 1, 1, N'03/02/2019 0:00:00 +01:00', 1, 0)
-INSERT INTO [dbo].[AspNetUsers] ([Id], [Name], [Surname], [UserName], [NormalizedUserName], [Email], [NormalizedEmail], [EmailConfirmed], [PasswordHash], [SecurityStamp], [ConcurrencyStamp], [PhoneNumber], [PhoneNumberConfirmed], [TwoFactorEnabled], [LockoutEnd], [LockoutEnabled], [AccessFailedCount]) VALUES (N'4', N'Marcos', N'Gonzalez', N'MarcosGamerXXX', N'MArcosGamerXXX', N'MarcosGAMER@gmail.com', N'MarcosGAMER@gmail.com', 1, N'5678', N'5678', N'5678', N'5678', 1, 1, N'09/12/2020 0:00:00 +01:00', 0, 1)
-INSERT INTO [dbo].[AspNetUsers] ([Id], [Name], [Surname], [UserName], [NormalizedUserName], [Email], [NormalizedEmail], [EmailConfirmed], [PasswordHash], [SecurityStamp], [ConcurrencyStamp], [PhoneNumber], [PhoneNumberConfirmed], [TwoFactorEnabled], [LockoutEnd], [LockoutEnabled], [AccessFailedCount]) VALUES (N'5', N'Aitor', N'Herrero', N'AitorPedos', N'AitorPedos', N'AitorAitor@gmail.com', N'AitorAitor@gmail.com', 1, N'1456', N'1456', N'1456', N'1456', 1, 1, N'17/07/2021 0:00:00 +02:00', 1, 2)
+-- Nota: El PasswordHash de abajo corresponde a "Password123!"
+-- Así podrás entrar con cualquiera de ellos usando esa contraseña.
+
+INSERT INTO [dbo].[AspNetUsers] ([Id], [Name], [Surname], [UserName], [NormalizedUserName], [Email], [NormalizedEmail], [EmailConfirmed], [PasswordHash], [SecurityStamp], [ConcurrencyStamp], [PhoneNumber], [PhoneNumberConfirmed], [TwoFactorEnabled], [LockoutEnd], [LockoutEnabled], [AccessFailedCount]) 
+VALUES 
+(N'1', N'juan', N'lopez', N'juanKILLA', N'JUANKILLA', N'juanXkilla@gmail.com', N'JUANXKILLA@GMAIL.COM', 1, 
+N'AQAAAAIAAYagAAAAELlWr7tDq+8j4Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q==', -- Hash de ejemplo (Genera uno real y pégalo aquí)
+NEWID(), NEWID(), N'1234', 1, 0, NULL, 1, 0),
+
+(N'2', N'Paco', N'Nuñez', N'PacoSinger', N'PACOSINGER', N'pacoSinger@gmail.com', N'PACOSINGER@GMAIL.COM', 1, 
+N'AQAAAAIAAYagAAAAELlWr7tDq+8j4Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q==', 
+NEWID(), NEWID(), N'2345', 1, 0, NULL, 1, 0),
+
+(N'3', N'Laura', N'Jimenez', N'LauraWita', N'LAURAWITA', N'Laura@gmail.com', N'LAURA@GMAIL.COM', 1, 
+N'AQAAAAIAAYagAAAAELlWr7tDq+8j4Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q==', 
+NEWID(), NEWID(), N'4567', 1, 0, NULL, 1, 0),
+
+(N'4', N'Marcos', N'Gonzalez', N'MarcosGamerXXX', N'MARCOSGAMERXXX', N'MarcosGAMER@gmail.com', N'MARCOSGAMER@GMAIL.COM', 1, 
+N'AQAAAAIAAYagAAAAELlWr7tDq+8j4Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q==', 
+NEWID(), NEWID(), N'5678', 1, 0, NULL, 0, 0),
+
+(N'5', N'Aitor', N'Herrero', N'AitorPedos', N'AITORPEDOS', N'AitorAitor@gmail.com', N'AITORAITOR@GMAIL.COM', 1, 
+N'AQAAAAIAAYagAAAAELlWr7tDq+8j4Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q==', 
+NEWID(), NEWID(), N'1456', 1, 0, NULL, 1, 0);

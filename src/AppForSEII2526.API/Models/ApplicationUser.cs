@@ -13,14 +13,14 @@ namespace AppForSEII2526.API.Models
         }
 
         [Display(Name = "Nombre")]
-        public string Name
+        public string? Name
         {
             get;
             set;
         }
 
         [Display(Name = "Apellido")]
-        public string Surname
+        public string? Surname
         {
             get;
             set;
