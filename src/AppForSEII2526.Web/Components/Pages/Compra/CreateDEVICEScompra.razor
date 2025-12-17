@@ -10,7 +10,7 @@
 @inject PurchaseStateContainer PurchaseState
 @inject AppForSEII2526APIClient Client
 @inject NavigationManager NavigationManager
-@inject ILogger<DetailsDEVICEScompra> Logger
+@inject ILogger<CreateDEVICEScompra> Logger
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
 @* 3. ATRIBUTOS *@
@@ -203,7 +203,6 @@
             // Simple y efectivo, sin mapeo manual
             var result = await Client.CreatePurchaseAsync(PurchaseState.Purchase);
 
-            // Limpieza y redirección
             PurchaseState.PurchaseProcessed();
 
             // Cuando tenga vista de detalles, cambia "/" por "/compra/detalle/{result.Id}"
