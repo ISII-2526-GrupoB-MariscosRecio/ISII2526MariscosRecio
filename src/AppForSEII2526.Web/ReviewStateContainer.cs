@@ -29,7 +29,8 @@ namespace AppForSEII2526.Web {
                 Review.ReviewItems.Add(new ReviewItemDTO() {
                     DeviceId = device.Id,
                     ModelName = device.Model,
-                    DeviceYear = device.Year
+                    DeviceYear = device.Year,
+                    DeviceName = device.Name
                 }
             );
 
