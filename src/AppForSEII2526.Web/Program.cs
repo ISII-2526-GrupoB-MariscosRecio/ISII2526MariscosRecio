@@ -49,9 +49,12 @@ builder.Services.AddScoped<AppForSEII2526APIClient>(sp => new AppForSEII2526APIC
 // Registramos el StateContainer para gestionar el estado de la compra (carrito)
 builder.Services.AddScoped<PurchaseStateContainer>();
 
+//State container para alquiler
+builder.Services.AddScoped<RentalStateContainer>();
 builder.Services.AddScoped<ReviewStateContainer>();
 
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
