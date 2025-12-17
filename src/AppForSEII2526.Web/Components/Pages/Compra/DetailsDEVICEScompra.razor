@@ -1,0 +1,142 @@
+﻿@page "/compra/detalles"
+
+@using AppForSEII2526.Web.API
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject AppForSEII2526APIClient apiclient
+
+@attribute [Authorize]
+
+<h3>Purchase Details</h3>
+
+@if (!string.IsNullOrEmpty(error))
+{
+    <div class="alert alert-danger">@error</div>
+}
+else if (purchase == null)
+{
+    <div class="text-center">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p>Cargando detalles...</p>
+    </div>
+}
+else
+{
+    <table class="table table-borderless table-sm">
+        <tr>
+            <th>Name</th>
+            <td id="Name">
+                @purchase.CustomerName
+            </td>
+        </tr>
+
+        <tr>
+            <th>Surname</th>
+            <td id="Surname">
+                @purchase.CustomerSurname
+            </td>
+        </tr>
+
+        <tr>
+            <th>Delivery Address</th>
+            <td id="DeliveryAddress">
+                @purchase.DeliveryAddress
+            </td>
+        </tr>
+
+        <tr>
+            <th>Purchase Date</th>
+            <td id="PurchaseDate">
+                @purchase.PurchaseDate.ToString("dd/MM/yyyy HH:mm:ss")
+            </td>
+        </tr>
+    </table>
+
+    <h4>Purchased Devices</h4>
+
+    <table class="table" id="PurchasedDevices">
+        <thead>
+            <tr>
+                <th scope="col">Brand</th>
+                <th scope="col">Model</th>
+                <th scope="col">Color</th>
+                <th scope="col">Price</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            @* CONFIRMADO: Usamos 'Items' porque has verificado que funciona *@
+            @foreach (var item in purchase.Items)
+            {
+                @* ERROR REAL CORREGIDO: Swagger suele usar 'Id' en lugar de 'DeviceID' *@
+                <tr id="PurchaseItem_@item.Id">
+                    <td>@item.Brand</td>
+                    <td>@item.Model</td>
+                    <td>@item.Color</td>
+
+                    @* CONFIRMADO: Usamos 'UnitPrice' porque has verificado que funciona *@
+                    <td>@item.UnitPrice.ToString("C")</td>
+
+                    <td>@item.Quantity</td>
+                    <td>@item.Description</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <th scope="row" colspan="4" class="text-end">Total Price</th>
+                <td colspan="2" id="TotalPrice">
+                    @purchase.TotalPrice.ToString("C")
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+}
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "id")]
+    public int PurchaseID { get; set; }
+
+    
+    private PurchaseDetailsDTO purchase;
+    private string error = "";
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        string userName = "";
+
+        // 1. Obtener usuario
+        if (authenticationState is not null)
+        {
+            var authState = await authenticationState;
+            var user = authState?.User;
+
+            if (user is not null && user.Identity is not null && user.Identity.IsAuthenticated)
+            {
+                userName = user.Identity.Name;
+            }
+        }
+
+        // 2. Llamada a la API
+        try
+        {
+            purchase = await apiclient.GetPurchaseAsync(PurchaseID);
+        }
+        catch (ApiException)
+        {
+            purchase = null;
+        }
+
+        // 3. Verificación
+        if (purchase == null)
+        {
+            error = $"Error! Purchase not found or unauthorized (ID={PurchaseID})";
+        }
+    }
+}

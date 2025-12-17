@@ -30,12 +30,13 @@
             </NavLink>
         </div>
 
-        @*botón de enlace en el menú de navegación de la aplicación(selección devices compra)*@
+        @*botón de enlace en el menú de navegación de la aplicación(selección devices alquiler)*@
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="Rental/selectdevices">
                 <span aria-hidden="true" style="font-size: 1.5rem; margin-right: 5px;">🛒</span> Alquilar (Rental)
             </NavLink>
         </div>
+
         @*botón de enlace en el menú de navegación de la aplicación*@
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="/compra/seleccion">
@@ -43,10 +44,18 @@
             </NavLink>
         </div>
 
-        @*boton de enlace en el menú de navegación de la aplicación (detalles compra)*@
+        @*boton de enlace en el menú de navegación de la aplicación (Create compra)*@
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="/compra/create">
-                <span class="bi bi-cart-check-fill" aria-hidden="true"></span> Creacion Compra
+                <span class="bi bi-cart-check-fill" aria-hidden="true"></span> Finalizar Compra
+            </NavLink>
+        </div>
+
+		@*boton de enlace en el menú de navegación de la aplicación (Detalle compra)*@
+        <div class="nav-item px-3">
+            @* Este enlace lleva al HISTORIAL, no a un detalle fijo *@
+            <NavLink class="nav-link" href="compra/historial">
+                <span class="bi bi-clock-history" aria-hidden="true"></span> Mis Pedidos
             </NavLink>
         </div>
 
