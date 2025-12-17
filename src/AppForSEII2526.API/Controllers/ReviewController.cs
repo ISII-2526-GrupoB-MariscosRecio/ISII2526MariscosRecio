@@ -127,7 +127,7 @@ namespace AppForSEII2526.API.Controllers
                 }).ToList();
 
             Review review = new Review {
-                DateOfReview = reviewForCreate.DateOfReview, 
+                DateOfReview = DateTime.Now, 
                 ReviewTitle = reviewForCreate.ReviewTitle,
                 CustomerId = reviewForCreate.CustomerId, 
                 CustomerCountry = reviewForCreate.CustomerCountry,

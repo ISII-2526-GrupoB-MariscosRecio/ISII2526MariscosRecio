@@ -36,7 +36,7 @@
         </div>
         <div class="col-md-4">
             <div class="form-floating mb-3">
-                @* CORRECCIÓN: Usamos InputSelect porque el DTO espera un int y el Controller solo acepta 1, 5, 10, 20 *@
+                @* Usamos InputSelect porque el DTO espera un int y el Controller solo acepta 1, 5, 10, 20 *@
                 <InputSelect @bind-Value="review.CustomerCountry" class="form-select" id="Country">
                     <option value="0" disabled selected>Select country...</option>
                     <option value="1">Spain</option>    @* Valor 1 *@
@@ -50,7 +50,7 @@
 
         <div class="col-md-4">
             <div class="form-floating mb-3">
-                @* Usuario: Es string, así que InputText es correcto. El controller valida que exista el UserName *@
+                @*  El controller valida que exista el UserName *@
                 <InputText @bind-Value="review.CustomerId" class="form-control" id="CustomerName" placeholder="UserName" />
                 <label for="CustomerName">User Name (Must be registered)</label>
             </div>
@@ -164,7 +164,7 @@
 
     // Flujo Alternativo 4
     private void ModifyReviewItems() {
-        navigation.NavigateTo("/Review/SelectDeviceForReview");
+        navigation.NavigateTo("/Review/SelectDeviceForReview?EditMode=true");
     }
 
     // Flujo Alternativo 1 (Implementado en la tabla)
@@ -175,7 +175,7 @@
     }
 
     private void OpenDialog() {
-        // Validación manual extra si es necesario (ej: score != 0)
+        // Validación manual extra si es necesario
         if (review.ReviewItems.Any(x => x.Rating < 1 || x.Rating > 5)) {
             messageError = "All devices must have a score between 1 and 5.";
             return;
@@ -194,7 +194,7 @@
                     var createdReview = await apiclient.CreateReviewAsync(review);
 
                     // Paso 7: Navegar a los detalles de la reseña creada
-                    navigation.NavigateTo($"/Review/DetailReview/?ReviewID={createdReview.Id}");
+                    navigation.NavigateTo($"/Review/DetailsReview/?ReviewID={createdReview.Id}");
                 }
                 catch (ApiException<ValidationProblemDetails> apiexceptionvalidation) {
                     // Flujo Alternativo 3: Datos obligatorios faltantes detectados por backend
@@ -218,4 +218,5 @@
         }
     }
 }
-}
+
+
