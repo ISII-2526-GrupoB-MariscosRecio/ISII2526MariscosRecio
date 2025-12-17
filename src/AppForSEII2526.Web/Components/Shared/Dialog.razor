@@ -1,10 +1,9 @@
-﻿﻿<div class="modal fade show" id="DialogOKSaveDelete" style="display:block; background-color: rgba(10,10,10,.8);" aria-modal="true" role="dialog">
+﻿<div class="modal fade show" id="DialogOKSaveDelete" style="display:block; background-color: rgba(10,10,10,.8);" aria-modal="true" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">@Caption</h4>
-                <button type="button" class="close"
-                        @onclick="@Cancel">
+                <button type="button" class="close" @onclick="@Cancel">
                     &times;
                 </button>
             </div>
@@ -39,27 +38,31 @@
         </div>
     </div>
 </div>
-@code {
 
-    //this parameter will be used to show a title in the modal dialog
+@code {
+    // Título del Modal
     [Parameter] public string Caption { get; set; }
 
-    //This parameter will be used to inform user about a message
+    // Mensaje del cuerpo
     [Parameter] public string Message { get; set; }
+
+    // Evento de cierre (True = Confirmar, False = Cancelar)
     [Parameter] public EventCallback<bool> OnClose { get; set; }
 
-    //this parameter will help to control which type of buttons will be shown
+    // Tipo de botones a mostrar
     [Parameter] public Category Type { get; set; }
 
-    //it will return false in case user cancels the operation
+    // Cancela la operación (Devuelve false)
     private Task Cancel() {
         return OnClose.InvokeAsync(false);
     }
 
-    //it will return false in case user confirms the operation
+    // Confirma la operación (Devuelve true)
     private Task Ok() {
         return OnClose.InvokeAsync(true);
     }
+
+    // Enum para los tipos de botones
     public enum Category {
         Okay,
         SaveNot,
