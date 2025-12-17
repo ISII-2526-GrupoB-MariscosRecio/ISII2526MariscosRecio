@@ -95,7 +95,7 @@ else {
         }
 
         try {
-            rental = await apiclient.GetRentalAsync(RentalID);
+            rental = await apiclient.RentalAsync(RentalID);
         }
         catch (ApiException exception) {
             rental = null;
