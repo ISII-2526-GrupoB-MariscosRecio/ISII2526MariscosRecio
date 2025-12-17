@@ -19,7 +19,6 @@
         "tags": [
           "Device"
         ],
-        "operationId": "ComputeDivision",
         "parameters": [
           {
             "name": "op1",
@@ -90,7 +89,6 @@
         "tags": [
           "Device"
         ],
-        "operationId": "GetDevice",
         "responses": {
           "200": {
             "description": "OK",
@@ -129,7 +127,6 @@
         "tags": [
           "Device"
         ],
-        "operationId": "GetDevicesParaPurchase",
         "parameters": [
           {
             "name": "nombreFILTRO",
@@ -184,7 +181,6 @@
         "tags": [
           "Device"
         ],
-        "operationId": "GetDevicesParaRent",
         "parameters": [
           {
             "name": "Model",
@@ -240,7 +236,6 @@
         "tags": [
           "Device"
         ],
-        "operationId": "GetDevicesParaReview",
         "parameters": [
           {
             "name": "Brand",
@@ -296,7 +291,6 @@
         "tags": [
           "PurchaseControler"
         ],
-        "operationId": "GetPurchase",
         "parameters": [
           {
             "name": "id",
@@ -356,7 +350,6 @@
         "tags": [
           "PurchaseControler"
         ],
-        "operationId": "CreatePurchase",
         "requestBody": {
           "content": {
             "application/json": {
@@ -445,7 +438,6 @@
         "tags": [
           "Rental"
         ],
-        "operationId": "CreateRental",
         "requestBody": {
           "content": {
             "application/json": {
@@ -534,7 +526,6 @@
         "tags": [
           "Rental"
         ],
-        "operationId": "GetRental",
         "parameters": [
           {
             "name": "id",
@@ -595,7 +586,6 @@
         "tags": [
           "Review"
         ],
-        "operationId": "GetReview",
         "parameters": [
           {
             "name": "id",
@@ -655,7 +645,6 @@
         "tags": [
           "Review"
         ],
-        "operationId": "CreateReview",
         "requestBody": {
           "content": {
             "application/json": {

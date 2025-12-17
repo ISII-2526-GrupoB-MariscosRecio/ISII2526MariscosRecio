@@ -45,7 +45,7 @@ namespace AppForSEII2526.API.Models
 
         public IList<ReviewItem> ReviewItems { get; set; }
 
-        public ApplicationUser ApplicationUser { get; set; }
+        public ApplicationUser? ApplicationUser { get; set; }
 
     }
 }

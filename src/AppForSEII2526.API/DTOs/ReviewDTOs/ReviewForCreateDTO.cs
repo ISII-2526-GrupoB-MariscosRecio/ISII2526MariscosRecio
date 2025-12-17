@@ -22,7 +22,7 @@
         [Required(AllowEmptyStrings = false, ErrorMessage = "Please, enter a Title for the Review")]
         public string ReviewTitle { get; set; }
 
-        public string CustomerId { get; set; }
+        public string? CustomerId { get; set; }
 
         [Required(ErrorMessage = "Please, enter a Country for the Customer")]
         public int CustomerCountry { get; set; }

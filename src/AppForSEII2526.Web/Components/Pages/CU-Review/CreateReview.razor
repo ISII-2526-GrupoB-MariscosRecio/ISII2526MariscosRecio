@@ -1,0 +1,221 @@
+﻿@page "/Review/CreateReview"
+
+
+@using AppForSEII2526.Web.Components.Shared
+@using AppForSEII2526.Web.API
+@using Microsoft.AspNetCore.Authorization
+
+@inject AppForSEII2526APIClient apiclient
+@inject ILogger<CreateReview> logger
+@inject ReviewStateContainer reviewState
+@inject NavigationManager navigation
+
+@attribute [AllowAnonymous]
+
+<h3>Create Review</h3>
+
+<EditForm Model="review" OnValidSubmit="OpenDialog">
+    <div class="row">
+        <DataAnnotationsValidator />
+        <ValidationSummary class="row alert alert-danger" />
+    </div>
+
+    @* Muestra errores de API (Flujo alternativo 3 y generales) *@
+    <div class="row alert alert-danger" role="alert" hidden="@hideErrors">
+        <p id="ErrorsShown">Errors: @messageError</p>
+    </div>
+
+    @* --- Cabecera de la Reseña (Paso 5: Título, País, Nombre) --- *@
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="form-floating mb-3">
+                @* Título (Obligatorio) *@
+                <InputText @bind-Value="review.ReviewTitle" class="form-control" id="Title" placeholder="Title" />
+                <label for="Title">Review Title *</label>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-floating mb-3">
+                @* CORRECCIÓN: Usamos InputSelect porque el DTO espera un int y el Controller solo acepta 1, 5, 10, 20 *@
+                <InputSelect @bind-Value="review.CustomerCountry" class="form-select" id="Country">
+                    <option value="0" disabled selected>Select country...</option>
+                    <option value="1">Spain</option>    @* Valor 1 *@
+                    <option value="5">France</option>   @* Valor 5 *@
+                    <option value="10">Germany</option> @* Valor 10 *@
+                    <option value="20">Italy</option>   @* Valor 20 *@
+                </InputSelect>
+                <label for="Country">Country *</label>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="form-floating mb-3">
+                @* Usuario: Es string, así que InputText es correcto. El controller valida que exista el UserName *@
+                <InputText @bind-Value="review.CustomerId" class="form-control" id="CustomerName" placeholder="UserName" />
+                <label for="CustomerName">User Name (Must be registered)</label>
+            </div>
+        </div>
+    </div>
+
+    @* --- Botonera Superior --- *@
+    <div class="row mb-3">
+        <div class="col-md-12 text-end">
+            @* Flujo Alternativo 4: Modificar dispositivos seleccionados (Volver al paso 2) *@
+            <button class="btn btn-outline-secondary me-2" type="button" @onclick="ModifyReviewItems" id="ModifyDevices">
+                Modify selection
+            </button>
+
+            @* Paso 6: Guardar reseña *@
+            <button class="btn btn-primary" type="submit" id="Submit" disabled="@reviewButtonDisabled">
+                Save Review
+            </button>
+        </div>
+    </div>
+
+    <h4>Devices to Review</h4>
+    
+    @* --- Tabla de Items (Paso 5: Mostrar datos y pedir Comentario/Puntuación) --- *@
+    <div class="mh-100 table-responsive">
+        <table class="table table-condensed table-hover align-middle" id="TableOfReviewItems">
+            <thead>
+                <tr>
+                    @* Datos de solo lectura *@
+                    <th style="width: 15%">Name</th>
+                    <th style="width: 10%">Year</th>
+                    <th style="width: 10%">Model</th>
+                    @* Datos a rellenar *@
+                    <th style="width: 40%">Comment *</th>
+                    <th style="width: 15%">Score (1-5) *</th>
+                    <th style="width: 10%">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (review.ReviewItems != null)
+                {
+                    @foreach (var item in review.ReviewItems)
+                    {
+                        <tr id="DeviceRow_@item.DeviceId">
+                            <td>@item.DeviceName</td>
+                            <td>@item.DeviceYear</td>
+                            <td>@item.ModelName</td>
+                            <td>
+                                @* Comentario obligatorio *@
+                                <InputTextArea @bind-Value="item.Comments" class="form-control" rows="2" placeholder="Write your opinion..." />
+                            </td>
+                            <td>
+                                @* Puntuación obligatoria (Flujo Alt 5: Controlado por Select) *@
+                                <InputSelect @bind-Value="item.Rating" class="form-select">
+                                    <option value="0" disabled selected>Select...</option>
+                                    <option value="1">1 - Poor</option>
+                                    <option value="2">2 - Fair</option>
+                                    <option value="3">3 - Good</option>
+                                    <option value="4">4 - Very Good</option>
+                                    <option value="5">5 - Excellent</option>
+                                </InputSelect>
+                            </td>
+                            <td>
+                                @* Flujo Alternativo 1: Eliminar dispositivos que ya no interesan *@
+                                <button type="button" class="btn btn-danger btn-sm" @onclick="@(() => RemoveItem(item))">
+                                    Remove
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+        @if (review.ReviewItems == null || review.ReviewItems.Count == 0)
+        {
+            <div class="alert alert-warning">No devices selected for review. Please go back and select devices.</div>
+        }
+    </div>
+
+</EditForm>
+
+@* --- Modal de Confirmación --- *@
+@if (DialogIsOpen)
+{
+    <Dialog Caption="Confirm Review"
+            Message="Do you want to publish this review?"
+            OnClose="@OnDialogClose"
+            Type=Dialog.Category.SaveNot>
+    </Dialog>
+}
+
+
+
+@code {
+    private string messageError = "";
+    private bool hideErrors { get { return messageError.Length == 0; } }
+
+    // Deshabilitar botón si no hay items
+    private bool reviewButtonDisabled { get { return (review.ReviewItems == null || review.ReviewItems.Count == 0); } }
+
+    private bool DialogIsOpen;
+
+    // Obtenemos el DTO del estado (Singleton/Scoped service)
+    private ReviewForCreateDTO review => reviewState.Review;
+    protected override void OnInitialized() {
+        // Validacion inicial: Si el usuario entra directamente por URL sin items, redirigir o avisar
+        if (review.ReviewItems == null) {
+            review.ReviewItems = new List<ReviewItemDTO>();
+        }
+    }
+
+    // Flujo Alternativo 4
+    private void ModifyReviewItems() {
+        navigation.NavigateTo("/Review/SelectDeviceForReview");
+    }
+
+    // Flujo Alternativo 1 (Implementado en la tabla)
+    private void RemoveItem(ReviewItemDTO item) {
+        reviewState.RemoveReviewItemToReview(item);
+        // Forzamos repintado por si acaso, aunque Blazor suele detectarlo
+        StateHasChanged();
+    }
+
+    private void OpenDialog() {
+        // Validación manual extra si es necesario (ej: score != 0)
+        if (review.ReviewItems.Any(x => x.Rating < 1 || x.Rating > 5)) {
+            messageError = "All devices must have a score between 1 and 5.";
+            return;
+        }
+
+        DialogIsOpen = true;
+    }
+
+    private async Task OnDialogClose(bool isOk) {
+        DialogIsOpen = false;
+
+        if (isOk) {
+            if (review.ReviewItems.Count > 0) {
+                try {
+                    // Llamada a la API
+                    var createdReview = await apiclient.CreateReviewAsync(review);
+
+                    // Paso 7: Navegar a los detalles de la reseña creada
+                    navigation.NavigateTo($"/Review/DetailReview/?ReviewID={createdReview.Id}");
+                }
+                catch (ApiException<ValidationProblemDetails> apiexceptionvalidation) {
+                    // Flujo Alternativo 3: Datos obligatorios faltantes detectados por backend
+                    // Flujo Alternativo 5: Formatos no válidos detectados por backend
+                    if (apiexceptionvalidation.Result.Errors != null) {
+                        messageError = "";
+                        foreach (var errors in apiexceptionvalidation.Result.Errors.Values) {
+                            messageError = string.Join("(*) ", messageError, string.Join(" (*) ", errors));
+                        }
+                    }
+                }
+                catch (ApiException apiexception) {
+                    messageError = "Error while processing your request, please try again later!";
+                    logger.LogError($"API Error: {apiexception.Message}");
+                }
+                catch (Exception ex) {
+                    messageError = "An unexpected error occurred.";
+                    logger.LogError($"General Error: {ex.Message}");
+                }
+            }
+        }
+    }
+}
+}
