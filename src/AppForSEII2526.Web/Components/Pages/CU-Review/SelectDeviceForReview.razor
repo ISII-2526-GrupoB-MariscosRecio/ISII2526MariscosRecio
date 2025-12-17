@@ -1,0 +1,197 @@
+﻿@page "/Review/SelectDeviceForReview"
+
+@using Microsoft.AspNetCore.Authorization
+@using AppForSEII2526.Web.API
+
+
+@inject AppForSEII2526APIClient apiclient
+@inject ILogger<SelectDeviceForReview> logger
+@inject ReviewStateContainer reviewState
+@inject NavigationManager navigation
+
+@attribute [AllowAnonymous]
+<h3>Select Devices for Review</h3>
+
+<div class="container-fluid">
+    @* --- Área de Errores --- *@
+    <div class="row alert alert-danger" role="alert" hidden="@hideErrors">
+        <p id="ErrorsShown">Errors: @errors</p>
+    </div>
+
+    <div class="row">
+        @* --- Columna Izquierda: Filtros y Tabla (Paso 2 y 2.1) --- *@
+        <div class="col-8">
+
+            @* --- Filtros de Búsqueda (Paso 2.1: Marca y Año) --- *@
+            <div class="row">
+                @* Filtro: Brand (Marca) *@
+                <div class="col">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1">Brand</span>
+                        <select class="form-select" aria-label="Select Brand" @bind="deviceBrandSelected" id="selectBrand">
+                            <option value="All" selected>All</option>
+                            @foreach (string brandName in brandsNames) {
+                                <option value="@brandName">@brandName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                @* Filtro: Year (Año) - Aquí aplicamos tu lógica de int *@
+                <div class="col">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Year</span>
+                        @* Usamos input number. Si es 0 se asume "Todos" *@
+                        <input type="number" class="form-control" @bind="deviceYearSelected" placeholder="Year (0 for All)" id="inputYear" />
+                    </div>
+                </div>
+
+                @* Botón Buscar *@
+                <div class="col">
+                    <button type="button" class="btn btn-primary" @onclick=@SearchDevices id="searchDevices">Search devices</button>
+                </div>
+            </div>
+
+            @* --- Tabla de Resultados (Paso 2.3) --- *@
+            <div class="row">
+                @if (devices == null) {
+                    <p>Loading devices....</p>
+                }
+                else {
+                    <div class="mh-100 table-responsive">
+                        <table class="table table-condensed table-hover" id="TableOfDevices">
+                            <thead>
+                                <tr>
+                                    @* Columnas según Paso 2: nombre, marca, color, año, modelo *@
+                                    <th>Name</th>
+                                    <th>Brand</th>
+                                    <th>Color</th>
+                                    <th>Year</th>
+                                    <th>Model</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var dev in devices) {
+                                    <tr id="DeviceData_@dev.Id">
+                                        <td>@dev.Name</td>
+                                        <td>@dev.Brand</td>
+                                        <td>@dev.Color</td>
+                                        <td>@dev.Year</td>
+                                        <td>@dev.Model</td>
+                                        <td>
+                                            @* Paso 3: Seleccionar dispositivos *@
+                                            <button class="btn btn-outline-secondary" id="deviceToReview_@dev.Id" @onclick="@(() => AddDevice(dev))">Add to Review</button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+
+        @* --- Columna Derecha: Carrito de Reseñas (Paso 3 y 4) --- *@
+        <div class="col-2" hidden="@hideReviewingCart">
+            <div class="row">
+                <h3>Review Cart</h3>
+            </div>
+            @* Lista de items seleccionados *@
+            @foreach (ReviewItemDTO item in review.ReviewItems) {
+                <div class="row mb-2">
+                    <button type="button" class="btn btn-light" id="removeDevice_@item.DeviceId" @onclick="@(() => RemoveReviewItem(item))">
+                        x @item.DeviceName (@item.ModelName)
+                    </button>
+                </div>
+            }
+            @* Paso 4: Botón Reseñar Dispositivos (Navega a la siguiente pantalla) *@
+            <div class="row mt-3">
+                <button type="button" class="btn btn-primary" id="startReviewButton" @onclick=@GoToReviewForm>Review Devices</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@code {
+    private string deviceBrandSelected;
+    private int deviceYearSelected = 0;
+    private ICollection<string>? brandsNames = new List<string>();
+    private bool hideReviewingCart { get { return review.ReviewItems.Count == 0; } }
+    private ICollection<DeviceParaReseñasDTO> devices;
+    private bool hideErrors { get { return errors.Length == 0; } }
+    private string errors = "";
+    private string deviceName { get; set; }
+    private int? deviceYear { get; set; }
+    private DateTime _from;
+
+
+    private DateTime _to;
+
+
+    private ReviewForCreateDTO review => reviewState.Review;
+
+    private bool hiddenReviewingCart = true;
+
+    private void AddDevice(DeviceParaReseñasDTO device) {
+        reviewState.AddDeviceToReview(device);
+    }
+
+    private void RemoveReviewItem(ReviewItemDTO item) {
+        reviewState.RemoveReviewItemToReview(item);
+        if (review.ReviewItems.Count == 0) hiddenReviewingCart = true;
+    }
+
+    public async Task SearchDevices() {
+        // Lógica de filtrado de Marca
+        string? brandFilter = deviceBrandSelected == "All" ? null : deviceBrandSelected;
+
+        // Si el usuario deja el 0, manda null. Si pone un año manda el int.
+        int? yearFilter = deviceYearSelected == 0 ? null : deviceYearSelected;
+
+        try {
+            // Se llama al API pasando los filtros
+            devices = await apiclient.GetDevicesParaReviewAsync(brandFilter, yearFilter);
+            errors = "";
+        }
+        catch (Exception ex) {
+            logger.LogError($"{DateTime.Now} Error: {ex}");
+            errors = "Error while connecting to the system";
+        }
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync() {
+
+        try {
+            //brandsNames = await apiclient.G
+            // Simulación de datos para probar la interfaz
+            brandsNames = new List<string> { "Samsung", "Apple", "Xiaomi", "Sony", "LG" };
+            
+        }
+        catch (ApiException ex) {
+            if (brandsNames == null) brandsNames = new List<string>() { "All", };
+            logger.LogError("Error! There was an error while connecting to the GetGenresAsync service");
+        }
+
+        
+        
+
+        await SearchDevices(); 
+
+       
+    }
+
+    private void GoToReviewForm() {
+        // Validar Flujo Alternativo 2: Si no hay dispositivos, no dejar continuar
+        if (review.ReviewItems.Count == 0) {
+            errors = "You must select at least one device to review.";
+            return;
+        }
+
+        // Navegar a la pantalla del Paso 5 (Formulario de datos)
+        navigation.NavigateTo("/Review/CreateDeviceForReview");
+    }
+
+}

@@ -1,5 +1,4 @@
-﻿using AppForSEII2526.API.DTOs.PurchaseDTO;
-using AppForSEII2526.API.Models; // Aquí debe estar el enum PaymentMethod
+﻿using AppForSEII2526.Web.API; //CAMBIO IMPORTANTE: solo usamos las clases que genera Swagger
 
 namespace AppForSEII2526.Web
 {
@@ -24,6 +23,12 @@ namespace AppForSEII2526.Web
 
         public void AddDeviceToPurchase(PurchaseItemDTO device)
         {
+            //Prueba de seguridad para comprobar que la lista se ha inicializado (seguridad con el cliente generado)
+            if (Purchase.PurchaseItems == null)
+            {
+                Purchase.PurchaseItems = new List<PurchaseItemDTO>();
+            }
+
             // Comprobamos si el dispositivo ya está en el carrito
             var existingItem = Purchase.PurchaseItems.FirstOrDefault(pi => pi.Id == device.Id);
 
@@ -34,17 +39,19 @@ namespace AppForSEII2526.Web
             }
             else
             {
+               
                 // Si no existe, lo añadimos a la lista
-                // Nota: As de que 'device' trae atributos correctos
-                Purchase.PurchaseItems.Add(new PurchaseItemDTO(
-                    device.Id,
-                    device.Brand,
-                    device.Model,
-                    device.Color,
-                    device.UnitPrice,
-                    device.Quantity > 0 ? device.Quantity : 1, // Por defecto 1 si viene a 0
-                    device.Description ?? string.Empty
-                ));
+                // cambio: usamos inicialización de objeto ({}) para mayor claridad
+                Purchase.PurchaseItems.Add(new PurchaseItemDTO
+                {
+                    Id = device.Id,
+                    Brand = device.Brand,
+                    Model = device.Model,
+                    Color = device.Color,
+                    UnitPrice = device.UnitPrice,
+                    Quantity = device.Quantity > 0 ? device.Quantity : 1,  // Por defecto 1 si viene a 0
+                    Description = device.Description ?? string.Empty
+                });
             }
 
             ComputeTotalPrice();
@@ -68,7 +75,12 @@ namespace AppForSEII2526.Web
         // Método para recalcular el precio total basado en items y cantidades
         private void ComputeTotalPrice()
         {
-            TotalPrice = Purchase.PurchaseItems.Sum(pi => pi.UnitPrice * pi.Quantity);
+            if (Purchase.PurchaseItems != null) // Simple verificación de seguridad para que no pete el cliente generado
+            {
+                // double, decimal e int, son tipos compatibles en operaciones aritméticas
+                // cliente generado suele usar 'double' para precios. 
+                TotalPrice = (decimal)Purchase.PurchaseItems.Sum(pi => pi.UnitPrice * pi.Quantity);
+            }
         }
 
         // Se llama cuando se completa la compra (POST exitoso) para reiniciar el estado
@@ -81,13 +93,13 @@ namespace AppForSEII2526.Web
         // Método auxiliar para reiniciar/inicializar el objeto
         private void ResetPurchase()
         {
-            Purchase = new PurchaseForCreateDTO(
-                string.Empty,                 // CustomerUserName
-                string.Empty,                 // CustomerUserSurname
-                string.Empty,                 // DeliveryAddress
-                PaymentMethod.TarjetaCredito, // Valor por defecto (ajusta según tu Enum)
-                new List<PurchaseItemDTO>()
-            );
+            Purchase = new PurchaseForCreateDTO { 
+                CustomerUserName = string.Empty,                // CustomerUserName
+                CustomerUserSurname = string.Empty,             // CustomerUserSurname
+                DeliveryAddress = string.Empty,                 // DeliveryAddress
+                PaymentMethod = PaymentMethod.TarjetaCredito,   // Valor por defecto (ajusta según tu Enum)
+                PurchaseItems = new List<PurchaseItemDTO>()
+            };
             TotalPrice = 0;
         }
     }
