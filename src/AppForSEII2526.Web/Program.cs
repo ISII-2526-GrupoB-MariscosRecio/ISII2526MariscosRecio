@@ -5,6 +5,7 @@ using AppForSEII2526.Web.Data;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using AppForSEII2526.Web.API;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,10 +37,17 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
+string? URI2API = "https://localhost:7067/";
+builder.Services.AddScoped<AppForSEII2526APIClient>(sp => new AppForSEII2526APIClient(URI2API, new HttpClient()));
+
 // Registramos el StateContainer para gestionar el estado de la compra (carrito)
 builder.Services.AddScoped<PurchaseStateContainer>();
 
+//State container para alquiler
+builder.Services.AddScoped<RentalStateContainer>();
+
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

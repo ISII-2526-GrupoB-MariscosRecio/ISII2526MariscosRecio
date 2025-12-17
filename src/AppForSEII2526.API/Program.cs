@@ -4,11 +4,10 @@ using RabbitMQ.Client;
 using System.Text.Json;
 using AppForSEII2526.API;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Logging.AddRabbitMQ(builder.Configuration.GetSection("RabbitMQ"));
-//”RabbitMQ” coincide con el nombre del bloque de propiedades en appsettings.json
-// Add services to the container.
+
 
 builder.Services.AddControllers()
 //show definitions of enums as strings
@@ -65,9 +64,9 @@ builder.Services.AddSwaggerGen(options => {
         Contact = new OpenApiContact { Name = "Software Engineering II Team", Email = "isii@on.uclm.es" },
     });
     //this assign operation names, as the actual names they have
-    options.CustomOperationIds(apiDescription => {
-        return apiDescription.TryGetMethodInfo(out MethodInfo methodInfo) ? methodInfo.Name : null;
-    });
+    //options.CustomOperationIds(apiDescription => {
+      //  return apiDescription.TryGetMethodInfo(out MethodInfo methodInfo) ? methodInfo.Name : null;
+    //});
 
 });
 
