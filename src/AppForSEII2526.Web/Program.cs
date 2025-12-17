@@ -1,4 +1,5 @@
 using AppForSEII2526.Web;
+using AppForSEII2526.Web.API; // Para registrar el cliente HTTP
 using AppForSEII2526.Web.Components;
 using AppForSEII2526.Web.Components.Account;
 using AppForSEII2526.Web.Data;
@@ -38,10 +39,12 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
 
+// IMPORTANTE: El puerto 7067 sale de tu launchSettings.json de la API (https)
+
 string? URI2API = "https://localhost:7067/";
 
-//We create the service for accessing the API from where .WEB project
-builder.Services.AddScoped<AppForSEII2526APIClient>(sp => new AppForSEII2526APIClient(URI2API, new HttpClient()));
+//Creamos el servicio para acceder a la API desde el proyecto .WEB
+builder.Services.AddScoped<AppForSEII2526APIClient>(sp => new AppForSEII2526APIClient( URI2API, new HttpClient() ) );
 
 // Registramos el StateContainer para gestionar el estado de la compra (carrito)
 builder.Services.AddScoped<PurchaseStateContainer>();
