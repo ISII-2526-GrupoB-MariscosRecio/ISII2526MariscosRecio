@@ -61,9 +61,9 @@
         @* 4. Pago *@
         <div class="col-md">
             <div class="form-floating">
-                <InputSelect class="form-select" @bind-Value="rental.PaymentMethod" id="PaymentMethod">
+                <InputSelect class="form-select" @bind-Value="rental.PaymentMethod" id="Credit Card">
                     @foreach (var method in Enum.GetValues(typeof(PaymentMethodTypes))) {
-                        <option value="@method">@method</option>
+                        <option id ="PaymentMethod"value="@method">@method</option>
                     }
                 </InputSelect>
                 <label for="PaymentMethod">Payment Method</label>
@@ -73,7 +73,7 @@
         @* Botón *@
         <div class="col-md">
             <div class="form-floating">
-                <button class="btn btn-primary w-100 h-100" type="submit" disabled="@rentalButtonDisabled">
+                <button class="btn btn-primary w-100 h-100" id="btnSubmit" type="submit" disabled="@rentalButtonDisabled">
                     Rent your devices
                 </button>
             </div>
@@ -85,7 +85,7 @@
     <p>
         @* Usamos tu cálculo del state, que es más limpio *@
         <b>Total price:</b> @rentalState.TotalPrice €
-        <button type="button" class="btn btn-outline-primary ms-2" @onclick="ModifyRentalItems">
+        <button type="button" id="btnModify" class="btn btn-outline-primary ms-2" @onclick="ModifyRentalItems">
             Modify devices
         </button>
     </p>

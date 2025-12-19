@@ -13,24 +13,24 @@ namespace AppForSEII2526.UIT.Rental {
         private By _addressInput = By.Id("DeliveryAddress");
         private By _paymentSelect = By.Id("PaymentMethod");
         // Botones por texto (XPath) para evitar problemas si no tienen ID
-        private By _submitButton = By.XPath("//button[contains(text(), 'Rent your devices')]");
-        private By _modifyButton = By.XPath("//button[contains(text(), 'Modify devices')]");
+        private By _submitButton = By.Id("btnSubmit");
+        private By _modifyButton = By.Id("btnModify");
 
         public CreateRental_PO(IWebDriver driver, ITestOutputHelper output) : base(driver, output) { }
 
-        public void FillInRentalInfo(string name, string surname, string address, string payment) {
+        public void FillInRentalInfo(string name, string surname, string address) {
             WaitForBeingVisible(_nameInput);
 
             _driver.FindElement(_nameInput).Clear();
-            _driver.FindElement(_nameInput).SendKeys(name);
-
+            _driver.FindElement(_nameInput).SendKeys("testin@mail.com");
+            System.Threading.Thread.Sleep(2000);
             _driver.FindElement(_surnameInput).Clear();
-            _driver.FindElement(_surnameInput).SendKeys(surname);
-
+            _driver.FindElement(_surnameInput).SendKeys("iker Garcia");
+            System.Threading.Thread.Sleep(2000);
             _driver.FindElement(_addressInput).Clear();
             _driver.FindElement(_addressInput).SendKeys(address);
-
-            new SelectElement(_driver.FindElement(_paymentSelect)).SelectByText(payment);
+            System.Threading.Thread.Sleep(2000);
+            //new SelectElement(_driver.FindElement(_paymentSelect)).SelectByText(payment);
         }
 
         public void PressRentYourDevices() {

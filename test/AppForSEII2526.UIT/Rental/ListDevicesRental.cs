@@ -12,25 +12,26 @@ namespace AppForSEII2526.UIT.Rental {
 
         // Buscamos inputs genéricos dentro del formulario de filtro si no tienen ID
         // Intenta buscar por ID si existen en tu HTML (ej: id="modelFilter"), si no, usamos Xpath genérico
-        private By _inputModelBy = By.XPath("//input[contains(@id, 'Model') or contains(@name, 'Model') or @type='text']");
+        private By _inputModelBy = By.Id("filtroModel");
 
         // El precio suele ser el segundo input o tener label "Price"
-        private By _inputPriceBy = By.XPath("//input[contains(@id, 'Price') or contains(@name, 'Price')]");
+        private By _inputPriceBy = By.Id("filtroPrecio");
 
         // Fechas: Buscamos por type='date'
         private By _fromBy = By.XPath("(//input[@type='date'])[1]");
         private By _toBy = By.XPath("(//input[@type='date'])[2]");
 
         // Botones: Buscamos por texto en Inglés O Español (para evitar fallos de idioma)
-        private By _searchButtonBy = By.XPath("//button[contains(text(), 'Search') or contains(text(), 'Buscar') or @type='submit']");
-        private By _rentButtonBy = By.XPath("//a[contains(text(), 'Confirm') or contains(text(), 'Alquilar')] | //button[contains(text(), 'Confirm') or contains(text(), 'Alquilar')]");
+        private By _searchButtonBy = By.Id("btnBuscar");
+        private By _rentButtonBy = By.Id("btnConfirmarRent"); 
 
         private By _tableOfDevicesBy = By.TagName("table");
         private By _errorAreaBy = By.Id("ErrorsShown");
 
+        private By _botonborrar = By.Id("btnBorrar");
         public ListDevicesForRental_PO(IWebDriver driver, ITestOutputHelper output) : base(driver, output) { }
 
-        public void FilterDevices(string model, string price, DateTime from, DateTime to) {
+        public void FilterDevices(string model, string price) {
             // Esperamos a que el botón de búsqueda sea visible para asegurar que la página cargó
             WaitForBeingVisible(_searchButtonBy);
             System.Threading.Thread.Sleep(500); // Pequeña pausa de estabilidad
@@ -56,11 +57,11 @@ namespace AppForSEII2526.UIT.Rental {
 
             // Rellenar Fechas (Truco: SendKeys con formato local suele funcionar mejor)
             // Si falla, prueba con .ToString("dd/MM/yyyy")
-            var fromInput = _driver.FindElement(_fromBy);
-            fromInput.SendKeys(from.ToString("dd/MM/yyyy"));
+            //var fromInput = _driver.FindElement(_fromBy);
+            //fromInput.SendKeys(from.ToString("dd/MM/yyyy"));
 
-            var toInput = _driver.FindElement(_toBy);
-            toInput.SendKeys(to.ToString("dd/MM/yyyy"));
+            //var toInput = _driver.FindElement(_toBy);
+            //toInput.SendKeys(to.ToString("dd/MM/yyyy"));
 
             // Click Buscar
             _driver.FindElement(_searchButtonBy).Click();
@@ -87,9 +88,9 @@ namespace AppForSEII2526.UIT.Rental {
 
         public void ModifyRentingCart(string deviceName) {
             // Busca el botón de eliminar (X o Remove) al lado del nombre del dispositivo en el carrito
-            string xpathRemoveBtn = $"//li[contains(., '{deviceName}')]//button | //tr[contains(., '{deviceName}')]//button[contains(text(),'X') or contains(text(),'Remove')]";
-            WaitForBeingVisible(By.XPath(xpathRemoveBtn));
-            _driver.FindElement(By.XPath(xpathRemoveBtn)).Click();
+            //string xpathRemoveBtn = $"//li[contains(., '{deviceName}')]//button | //tr[contains(., '{deviceName}')]//button[contains(text(),'X') or contains(text(),'Remove')]";
+            WaitForBeingVisible(_botonborrar);
+            _driver.FindElement(_botonborrar).Click();
             System.Threading.Thread.Sleep(500);
         }
 

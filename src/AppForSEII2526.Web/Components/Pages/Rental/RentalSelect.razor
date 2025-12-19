@@ -24,13 +24,13 @@
                 <div class="col">
                     <div class="input-group mb-3">
                         <span class="input-group-text">Modelo</span>
-                        <input type="text" @bind="deviceModel" class="form-control" placeholder="Ej: Galaxy..." />
+                        <input type="text" id="filtroModel" @bind="deviceModel" class="form-control" placeholder="Ej: Galaxy..." />
                     </div>
                 </div>
                 <div class="col">
                     <div class="input-group mb-3">
                         <span class="input-group-text">Max Price</span>
-                        <input type="number" @bind="rentPrice" class="form-control" />
+                        <input type="number" id="filtroPrecio" @bind="rentPrice" class="form-control" />
                     </div>
                 </div>
 
@@ -49,7 +49,7 @@
                 </div>
 
                 <div class="col">
-                    <button type="button" class="btn btn-primary" @onclick="@SearchDevice">Search</button>
+                    <button type="button" id="btnBuscar" class="btn btn-primary" @onclick="@SearchDevice">Search</button>
                 </div>
             </div>
 
@@ -106,13 +106,13 @@
                             @* Ahora aquí saldrá el nombre correcto *@
                             <span>@item.Model (@item.Quantity)</span>
                             <span class="badge bg-secondary">@item.RentPrice €/day</span>
-                            <button type="button" class="btn btn-danger btn-sm ms-2" @onclick="@(() => RemoveRentalItem(item))">X</button>
+                            <button type="button" id="b" class="btn btn-danger btn-sm ms-2" @onclick="@(() => RemoveRentalItem(item))">X</button>
                         </li>
                     }
                 </ul>
                 <div class="card-footer text-end">
                     <h5>Total: @rentalState.TotalPrice €</h5>
-                    <button type="button" class="btn btn-success w-100 mt-2" @onclick="@RentDevices">Confirm Rental</button>
+                    <button type="button" id ="btnConfirmarRent"class="btn btn-success w-100 mt-2" @onclick="@RentDevices">Confirm Rental</button>
                 </div>
             </div>
         </div>
