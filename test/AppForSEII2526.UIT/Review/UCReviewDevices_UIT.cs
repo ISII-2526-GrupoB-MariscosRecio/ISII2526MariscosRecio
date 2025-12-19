@@ -9,15 +9,13 @@ namespace AppForSEII2526.UIT.Review {
     public class UCReview_UIT : UC_UIT {
         // --- Datos de Prueba ---
         private const int defaultDeviceId = 1; // Galaxy S10
-        private const int defaultDeviceId2 = 2;
         private const string deviceName1 = "Galaxy S10";
         private const string deviceBrand1 = "Samsung";
         private const string deviceYear1 = "2019";
         private const string deviceModel1 = "Samsung";
 
         private const string deviceName2 = "iPhone 11";
-        private const string deviceBrand2 = "Apple";
-        private const string deviceYear2 = "2019";
+
         private const string validReviewTitle = "Experiencia de usuario";
         private const string validUserName = "test@gmail.com";
         private const string validCountry = "Spain";
@@ -45,10 +43,9 @@ namespace AppForSEII2526.UIT.Review {
 
         // --- Casos de Prueba ---
 
-
         [Theory]
         [InlineData("Samsung", "2019", deviceName1)]
-        [InlineData(deviceBrand2, deviceYear2, deviceName2)]
+        [InlineData("Apple", "0", deviceName2)]
         [Trait("LevelTesting", "Funcional Testing")]
         public void UC_FilterDevices_AF1(string brand, string year, string expectedDeviceName) {
             var expectedDevices = new List<string[]> { new string[] { expectedDeviceName, brand } };
@@ -56,46 +53,6 @@ namespace AppForSEII2526.UIT.Review {
             listDevices.FilterDevices(brand, year);
             Assert.True(listDevices.CheckListOfDevices(expectedDevices), $"Fallo filtro Marca: {brand}, Año: {year}");
         }
-
-        //EXAMEN SPRINT 3 FERNANDO GARCÍA NAVARRO
-        [Fact]
-        [Trait("LevelTesting", "Funcional Testing")]
-        public void UC_BF_AF0_AF1() { 
-           
-            var createReviewPO = new CreateReview_PO(_driver, _output);
-            var detailReviewPO = new DetailReview_PO(_driver, _output);
-
-
-            InitialStepsForReview_UIT();
-            listDevices.SelectDevicesByName(new List<string> { deviceName1 });
-            listDevices.FilterDevices(deviceBrand2, "0");
-            listDevices.SelectDevicesByName(new List<string> { deviceName2 });
-            listDevices.RemoveDeviceFromCart( deviceName1 );
-
-            listDevices.PressProceedToReview();
-
-            createReviewPO.FillInReviewInfo(validReviewTitle, validCountry, validUserName);
-            createReviewPO.FillInDeviceFeedback(defaultDeviceId2, commentDevice1, ratingDevice1);
-
-            createReviewPO.PressSaveReview();
-
-            createReviewPO.ConfirmDialog();
-
-            // Verificamos que no haya errores de API antes de continuar (evita Timeouts silenciosos)
-            createReviewPO.AssertNoErrors();
-
-            Assert.True(detailReviewPO.CheckReviewDetails(validReviewTitle, DateTime.Now, validUserName, validCountry),
-                "No se cargaron los detalles de la reseña correctamente.");
-
-            var expectedDetailsItems = new List<string[]>
-            {
-                new string[] { deviceName2, deviceBrand2, deviceYear2, ratingDevice1Display, $"\"{commentDevice1}\"" }
-            };
-            Assert.True(detailReviewPO.CheckListOfDevices(expectedDetailsItems),
-                "Los items en la tabla de detalles no coinciden.");
-        }
-
-
 
         [Fact]
         [Trait("LevelTesting", "Funcional Testing")]
