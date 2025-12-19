@@ -4,19 +4,22 @@ using System.Collections.Generic;
 using Xunit;
 using Xunit.Abstractions;
 using AppForSEII2526.UIT.Shared;
+using System.Security.Cryptography.X509Certificates;
 
 namespace AppForSEII2526.UIT.Rental {
     public class UCRental_UIT : UC_UIT {
         // --- Datos de Prueba (Basados en tu captura de pantalla) ---
         private const string deviceName1 = "Galaxy S10";
         private const string deviceBrand1 = "Samsung";
+        private const string deviceName3 = "iPhone 11";
+        private const string deviceBrand3 = "Apple";
 
         // Datos para filtrado que sabemos que existen
         private const string deviceName2 = "iPhone 11";
 
         // Datos de usuario para el formulario de Rental
-        private const string validName = "Fernando";
-        private const string validSurname = "Test";
+        private const string validName = "iker";
+        private const string validSurname = "Garcia";
         private const string validAddress = "Calle Universidad 1";
         private const string validPayment = "Credit Card"; // Asegúrate que este texto coincide con el <option> de tu HTML
 
@@ -58,7 +61,7 @@ namespace AppForSEII2526.UIT.Rental {
             InitialStepsForRental_UIT();
 
             // Aplicamos filtros
-            listDevices.FilterDevices(model, maxPrice, dateFrom, dateTo);
+            //listDevices.FilterDevices(model, maxPrice, dateFrom, dateTo);
 
             // Verificamos
             Assert.True(listDevices.CheckListOfDevices(expectedDevices),
@@ -70,7 +73,7 @@ namespace AppForSEII2526.UIT.Rental {
         public void UC_ProceedButtonDisabled_WhenNoSelection() {
             InitialStepsForRental_UIT();
             // Filtramos pero no seleccionamos nada
-            listDevices.FilterDevices("All", "", dateFrom, dateTo);
+            //listDevices.FilterDevices("All", "", dateFrom, dateTo);
 
             // El botón debe estar deshabilitado o no visible
             Assert.True(listDevices.CheckRentDevicesDisabled(),
@@ -84,7 +87,7 @@ namespace AppForSEII2526.UIT.Rental {
             InitialStepsForRental_UIT();
 
             // 1. Seleccionar 2 dispositivos
-            listDevices.FilterDevices("", "", dateFrom, dateTo);
+            //listDevices.FilterDevices("", "", dateFrom, dateTo);
             listDevices.SelectDevices(new List<string> { deviceName1, deviceName2 });
             listDevices.RentDevices(); // Ir a pantalla Create
 
@@ -113,12 +116,12 @@ namespace AppForSEII2526.UIT.Rental {
             InitialStepsForRental_UIT();
 
             // Llegar al formulario
-            listDevices.FilterDevices("", "", dateFrom, dateTo);
+            //listDevices.FilterDevices("", "", dateFrom, dateTo);
             listDevices.SelectDevices(new List<string> { deviceName1 });
             listDevices.RentDevices();
 
             // Rellenar con datos inválidos
-            createRentalPO.FillInRentalInfo(name, surname, address, payment);
+            //createRentalPO.FillInRentalInfo(name, surname, address, payment);
 
             createRentalPO.PressRentYourDevices();
 
@@ -135,13 +138,59 @@ namespace AppForSEII2526.UIT.Rental {
 
             // 1. Listado y Selección
             InitialStepsForRental_UIT();
-            listDevices.FilterDevices(deviceBrand1, "", dateFrom, dateTo); // Filtrar por Samsung
+
+            
+            //listDevices.FilterDevices(deviceBrand1, "", dateFrom, dateTo); // Filtrar por Samsung
             listDevices.SelectDevices(new List<string> { deviceName1 });   // Seleccionar Galaxy S10
+
+
+            
+
+
 
             listDevices.RentDevices(); // Clic en Confirm Rental
 
             // 2. Creación (Formulario)
-            createRentalPO.FillInRentalInfo(validName, validSurname, validAddress, validPayment);
+            //createRentalPO.FillInRentalInfo(validName, validSurname, validAddress, validPayment);
+
+            createRentalPO.PressRentYourDevices(); // Guardar
+
+            // Confirmación (Si hay modal)
+            createRentalPO.PressOkModalDialog();
+
+            // 3. Detalles (Verificar resultado final)
+            // Verificamos datos del usuario
+            Assert.True(detailRentalPO.CheckRentalDetail(validSurname, validAddress, validPayment, DateTime.Now, dateFrom, dateTo, "€"),
+                "No se cargaron los detalles del alquiler correctamente (Nombre/Dirección/Fechas).");
+
+            // Verificamos que el dispositivo esté en la tabla de detalles
+            var expectedDetailsItems = new List<string[]>
+            {
+                new string[] { deviceName1 }
+            };
+            Assert.True(detailRentalPO.CheckListOfDevices(expectedDetailsItems),
+                "Los items en la tabla de detalles final no coinciden con lo alquilado.");
+        }
+        //EXAMEN
+        [Fact]
+        [Trait("LevelTesting", "Funcional Testing")]
+        public void UC_Examen()
+        {
+            var createRentalPO = new CreateRental_PO(_driver, _output);
+            var detailRentalPO = new DetailRental_PO(_driver, _output);
+
+            // 1. Listado y Selección
+            InitialStepsForRental_UIT();
+            listDevices.SelectDevices(new List<string> { deviceName3 });
+            listDevices.FilterDevices(deviceBrand1, ""); // Filtrar por Samsung
+            listDevices.SelectDevices(new List<string> { deviceName1 });   // Seleccionar Galaxy S10
+
+            listDevices.ModifyRentingCart(deviceName3); 
+
+            listDevices.RentDevices(); // Clic en Confirm Rental
+
+            // 2. Creación (Formulario)
+            createRentalPO.FillInRentalInfo(validName, validSurname, validAddress);
 
             createRentalPO.PressRentYourDevices(); // Guardar
 
