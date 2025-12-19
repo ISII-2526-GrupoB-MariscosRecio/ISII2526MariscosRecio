@@ -9,15 +9,13 @@ namespace AppForSEII2526.UIT.Review {
     public class UCReview_UIT : UC_UIT {
         // --- Datos de Prueba ---
         private const int defaultDeviceId = 1; // Galaxy S10
-        private const int defaultDeviceId2 = 2;
         private const string deviceName1 = "Galaxy S10";
         private const string deviceBrand1 = "Samsung";
         private const string deviceYear1 = "2019";
         private const string deviceModel1 = "Samsung";
 
         private const string deviceName2 = "iPhone 11";
-        private const string deviceBrand2 = "Apple";
-        private const string deviceYear2 = "2019";
+
         private const string validReviewTitle = "Experiencia de usuario";
         private const string validUserName = "test@gmail.com";
         private const string validCountry = "Spain";
@@ -45,10 +43,9 @@ namespace AppForSEII2526.UIT.Review {
 
         // --- Casos de Prueba ---
 
-
         [Theory]
         [InlineData("Samsung", "2019", deviceName1)]
-        [InlineData(deviceBrand2, deviceYear2, deviceName2)]
+        [InlineData("Apple", "0", deviceName2)]
         [Trait("LevelTesting", "Funcional Testing")]
         public void UC_FilterDevices_AF1(string brand, string year, string expectedDeviceName) {
             var expectedDevices = new List<string[]> { new string[] { expectedDeviceName, brand } };

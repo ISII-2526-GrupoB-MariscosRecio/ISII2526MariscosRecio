@@ -9,7 +9,7 @@ namespace AppForSEII2526.UIT.Shared {
     public class UC_UIT : IDisposable {
 
         private bool _pipeline = false;
-        private string _browser = "Edge";
+        private string _browser = "Chrome";
         protected IWebDriver _driver;
         protected readonly ITestOutputHelper _output;
 
