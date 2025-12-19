@@ -201,7 +201,8 @@
         }
         catch (Exception ex) {
             logger.LogError($"{DateTime.Now} Error: {ex}");
-            errors = "Error while connecting to the system";
+
+            errors = ex.Message;
         }
         StateHasChanged();
     }
