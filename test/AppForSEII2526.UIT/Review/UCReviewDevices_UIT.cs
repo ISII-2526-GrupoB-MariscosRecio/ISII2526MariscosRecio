@@ -54,6 +54,46 @@ namespace AppForSEII2526.UIT.Review {
             Assert.True(listDevices.CheckListOfDevices(expectedDevices), $"Fallo filtro Marca: {brand}, Año: {year}");
         }
 
+        //EXAMEN SPRINT 3 FERNANDO GARCÍA NAVARRO.
+        [Fact]
+        [Trait("LevelTesting", "Funcional Testing")]
+        public void UC_BF_AF0_AF1() { 
+           
+            var createReviewPO = new CreateReview_PO(_driver, _output);
+            var detailReviewPO = new DetailReview_PO(_driver, _output);
+
+
+            InitialStepsForReview_UIT();
+            listDevices.SelectDevicesByName(new List<string> { deviceName1 });
+            listDevices.FilterDevices(deviceBrand2, "0");
+            listDevices.SelectDevicesByName(new List<string> { deviceName2 });
+            listDevices.RemoveDeviceFromCart( deviceName1 );
+
+            listDevices.PressProceedToReview();
+
+            createReviewPO.FillInReviewInfo(validReviewTitle, validCountry, validUserName);
+            createReviewPO.FillInDeviceFeedback(defaultDeviceId2, commentDevice1, ratingDevice1);
+
+            createReviewPO.PressSaveReview();
+
+            createReviewPO.ConfirmDialog();
+
+            // Verificamos que no haya errores de API antes de continuar (evita Timeouts silenciosos)
+            createReviewPO.AssertNoErrors();
+
+            Assert.True(detailReviewPO.CheckReviewDetails(validReviewTitle, DateTime.Now, validUserName, validCountry),
+                "No se cargaron los detalles de la reseña correctamente.");
+
+            var expectedDetailsItems = new List<string[]>
+            {
+                new string[] { deviceName2, deviceBrand2, deviceYear2, ratingDevice1Display, $"\"{commentDevice1}\"" }
+            };
+            Assert.True(detailReviewPO.CheckListOfDevices(expectedDetailsItems),
+                "Los items en la tabla de detalles no coinciden.");
+        }
+
+
+
         [Fact]
         [Trait("LevelTesting", "Funcional Testing")]
         public void UC_ProceedButtonDisabled_WhenNoSelection() {
