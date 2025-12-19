@@ -57,7 +57,7 @@ namespace AppForSEII2526.UIT.Review {
             Assert.True(listDevices.CheckListOfDevices(expectedDevices), $"Fallo filtro Marca: {brand}, Año: {year}");
         }
 
-        //EXAMEN SPRINT 3 FERNANDO GARCÍA NAVARRO
+        //EXAMEN SPRINT 3 FERNANDO GARCÍA NAVARRO.
         [Fact]
         [Trait("LevelTesting", "Funcional Testing")]
         public void UC_BF_AF0_AF1() { 
