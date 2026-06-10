@@ -35,15 +35,69 @@ namespace AppForSEII2526.UIT.Shared {
         }
 
         protected void Perform_login(string email, string password) {
-            _driver.Navigate().GoToUrl(_URI + "Account/Login");
+            _driver.Navigate()
+                    .GoToUrl(_URI + "Account/Login");
+            
+            // Esperar a que cargue la página de login
+            System.Threading.Thread.Sleep(1000);
+            
+            // Intentar múltiples selectores para el campo de email
+            IWebElement emailField = null;
+            try {
+                // Intento 1: Por nombre con punto
+                emailField = _driver.FindElement(By.Name("Input.Email"));
+            } catch (NoSuchElementException) {
+                try {
+                    // Intento 2: Por ID
+                    emailField = _driver.FindElement(By.Id("Input_Email"));
+                } catch (NoSuchElementException) {
+                    try {
+                        // Intento 3: Por tipo email
+                        emailField = _driver.FindElement(By.CssSelector("input[type='email']"));
+                    } catch (NoSuchElementException) {
+                        // Intento 4: Por autocomplete
+                        emailField = _driver.FindElement(By.CssSelector("input[autocomplete='username']"));
+                    }
+                }
+            }
+            
+            emailField.Clear();
+            emailField.SendKeys(email);
 
-            // Usamos selectores más robustos que el XPath posicional
-            // InputText de Blazor genera name="Model.Property"
-            _driver.FindElement(By.Name("Input.Email")).SendKeys(email);
-            _driver.FindElement(By.Name("Input.Password")).SendKeys(password);
+            // Intentar múltiples selectores para el campo de password
+            IWebElement passwordField = null;
+            try {
+                passwordField = _driver.FindElement(By.Name("Input.Password"));
+            } catch (NoSuchElementException) {
+                try {
+                    passwordField = _driver.FindElement(By.Id("Input_Password"));
+                } catch (NoSuchElementException) {
+                    passwordField = _driver.FindElement(By.CssSelector("input[type='password']"));
+                }
+            }
+            
+            passwordField.Clear();
+            passwordField.SendKeys(password);
 
-            // Selector CSS para el botón de submit (funciona siempre que sea <button type="submit">)
-            _driver.FindElement(By.CssSelector("button[type='submit']")).Click();
+            // Buscar el botón de login
+            IWebElement loginButton = null;
+            try {
+                // Intento 1: XPath original
+                loginButton = _driver.FindElement(By.XPath("/html/body/div[1]/main/article/div/div[1]/section/form/div[4]/button"));
+            } catch (NoSuchElementException) {
+                try {
+                    // Intento 2: Por tipo submit
+                    loginButton = _driver.FindElement(By.CssSelector("button[type='submit']"));
+                } catch (NoSuchElementException) {
+                    // Intento 3: Por texto
+                    loginButton = _driver.FindElement(By.XPath("//button[contains(text(), 'Log in') or contains(text(), 'Iniciar') or contains(text(), 'Login')]"));
+                }
+            }
+            
+            loginButton.Click();
+            
+            // Esperar a que se complete el login
+            System.Threading.Thread.Sleep(2000);
         }
 
         protected void SetUp_Chrome4UIT() {
