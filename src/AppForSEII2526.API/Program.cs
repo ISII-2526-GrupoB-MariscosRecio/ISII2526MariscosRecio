@@ -17,6 +17,26 @@ builder.Services.AddControllers()
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
 
+
+// Usuario 1: Usuario estándar
+var usuario1 = new ApplicationUser {
+    UserName = "juan.perez@example.com", // A menudo se usa el email como UserName
+    Email = "juan.perez@example.com",
+    Name = "Juan",          // OBLIGATORIO: No puede ser null
+    Surname = "Perez",      // OBLIGATORIO: No puede ser null
+    EmailConfirmed = true,  // Importante para que pueda hacer login inmediatamente
+    PhoneNumber = "123456789"
+};
+
+// Usuario 2: Otro usuario
+var usuario2 = new ApplicationUser {
+    UserName = "maria_garcia",
+    Email = "maria.garcia@test.com",
+    Name = "Maria",
+    Surname = "Garcia",
+    EmailConfirmed = true
+};
+
 // Add service for managing a sqlserver database that will be managed using ApplicationDBContext
 // the connection to the database was defined in appsettings
 
